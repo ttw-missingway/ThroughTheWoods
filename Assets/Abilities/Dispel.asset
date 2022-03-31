@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5056f39d68c010b40a4bd5a525232ddf, type: 3}
+  m_Name: Dispel
+  m_EditorClassIdentifier: 
+  Name: Dispel
+  Description: 
+  abilityFX: {fileID: 3595960919037275921, guid: 12d9de4e790cce342920521d8b5dd546, type: 3}
+  ChannelTime: 3
+  ExhaustTime: 3
+  AbilityType: 1
+  TargetTypes: 010000000200000004000000
+  TargetingMode: 1
+  RangeMin: 0
+  RangeMax: 10
+  Accuracy: 0
+  NoMiss: 0
+  ChangeNeutralState: 0
+  NeutralState: 0
+  AidType: 2
+  IsMagical: 1
+  MagicType: 3
+  StatusEffect: 0
+  statusEffectDuration: 0
+  ChangeStatsSelf: 0
+  StatSelf: 0
+  StatSelfDegree: 0
+  ChangeStatsTarget: 0
+  StatTarget: 0
+  StatTargetDegree: 0
+  Reposition: 0
+  Movement: 0
+  MovementDegree: 0
+  TrySignal: 0
+  AttackVariant: 0
+  Creation: 0
+  Trap: {fileID: 0}
+  Enemy: {fileID: 0}
+  Obstacle: {fileID: 0}
