@@ -1,123 +1,143 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace TTW.Combat
 {
+    public enum CombatDistance{
+        Front,
+        Back
+    }
+
+    public enum CombatSide{
+        Ally,
+        Enemy
+    }
+
     public class Position : MonoBehaviour
     {
-        Dictionary<Position, float> _distances = new Dictionary<Position, float>();
+        [SerializeField] CombatDistance _distance;
+        [SerializeField] int _orderNo;
+        [SerializeField] CombatSide _playingFieldSide;
 
-        public void CombatStart(List<Position> movers)
-        {
-            _distances.Clear();
+        [SerializeField] Position _leftNeighbor;
+        [SerializeField] Position _rightNeighbor;
 
-            foreach (var m in movers)
-            {
-                if (m == this) continue;
+        public Position[] Neighbors = new Position[2];
+        public CombatSide PlayingFieldSide => _playingFieldSide;
 
-                if (m.GetComponent<Targetable>().TargetType == GetComponent<Targetable>().TargetType)
-                {
-                    _distances.Add(m, 1f);
-                    print("distance between " + m.gameObject.name + " and " + gameObject.name + " is now " + _distances[m]);
-                }
-                else
-                {
-                    _distances.Add(m, 9f);
-                    print("distance between " + m.gameObject.name + " and " + gameObject.name + " is now " + _distances[m]);
-                }
+        public CombatDistance Distance => _distance;
+        public int OrderNo => _orderNo;
+
+        public void SetPositionOrder(List<Position> list, int index){
+            _orderNo = index + 1;
+            if (index > 0){
+                _leftNeighbor = list[index-1];
+                Neighbors[0] = _leftNeighbor;
+            }
+                
+            if (index < list.Count - 1){
+                _rightNeighbor = list[index+1];
+                Neighbors[1] = _rightNeighbor;
             }
         }
 
-        public float DistanceTo(Position position)
-        {
-            return _distances[position];
+        public void AreaAttackToNeighbors(Ability ability){
+            if (_leftNeighbor != null)
+                _leftNeighbor.GetComponent<Targetable>().ReceiveAbility(ability);
+            if (_rightNeighbor != null)
+                _rightNeighbor.GetComponent<Targetable>().ReceiveAbility(ability);
         }
 
-        public void Advance(Position target, float degree)
-        {
-            float grossMovement = Mathf.Min(_distances[target] - 1f, degree);
 
-            SingularAdvance(target, degree);
+        // Dictionary<Position, float> _distances = new Dictionary<Position, float>();
 
-            AdjustAllPositioning(target, grossMovement);
+        // public void CombatStart(List<Position> movers)
+        // {
+        //     _distances.Clear();
 
-            print("distance between " + target.gameObject.name + " and " + gameObject.name + " is now " + _distances[target]);
-        }
+        //     foreach (var m in movers)
+        //     {
+        //         if (m == this) continue;
 
-        public void Retreat(Position target, float degree)
-        {
-            float grossMovement = Mathf.Min(-1f * (_distances[target] - 10f), degree);
+        //         if (m.GetComponent<Targetable>().TargetType == GetComponent<Targetable>().TargetType)
+        //         {
+        //             _distances.Add(m, 1f);
+        //         }
+        //         else
+        //         {
+        //             _distances.Add(m, 9f);
+        //         }
+        //     }
+        // }
 
-            SingularRetreat(target, degree);
+        // public float DistanceTo(Position position)
+        // {
+        //     return _distances[position];
+        // }
 
-            AdjustAllPositioning(target, grossMovement);
+        // public void Advance(Position target, float degree)
+        // {
+        //     float grossMovement = Mathf.Min(_distances[target] - 1f, degree);
 
-            print("distance between " + target.gameObject.name + " and " + gameObject.name + " is now " + _distances[target]);
-        }
+        //     SingularAdvance(target, degree);
 
-        private void SingularAdvance(Position target, float degree)
-        {
-            _distances[target] -= degree;
+        //     AdjustAllPositioning(target, grossMovement);
 
-            if (_distances[target] < 1f)
-                _distances[target] = 1f;
+        //     CombatWriter.Singleton.Write("distance between " + target.gameObject.name + " and " + gameObject.name + " is now " + _distances[target]);
+        // }
 
-            target.PositionParity(this, _distances[target]);
-        }
+        // public void Retreat(Position target, float degree)
+        // {
+        //     float grossMovement = Mathf.Min(-1f * (_distances[target] - 10f), degree);
 
-        private void SingularRetreat(Position target, float degree)
-        {
-            _distances[target] += degree;
+        //     SingularRetreat(target, degree);
 
-            if (_distances[target] > 9f)
-                _distances[target] = 9f;
+        //     AdjustAllPositioning(target, grossMovement);
 
-            target.PositionParity(this, _distances[target]);
-        }
+        //     CombatWriter.Singleton.Write("distance between " + target.gameObject.name + " and " + gameObject.name + " is now " + _distances[target]);
+        // }
 
-        public void PositionParity(Position mover, float distance)
-        {
-            _distances[mover] = distance;
-        }
+        // private void SingularAdvance(Position target, float degree)
+        // {
+        //     _distances[target] -= degree;
 
-        private void AdjustAllPositioning(Position target, float degree)
-        {
-            var allPositions = FindObjectsOfType<Position>();
+        //     if (_distances[target] < 1f)
+        //         _distances[target] = 1f;
 
-            foreach (var p in allPositions)
-            {
-                if (p.gameObject == gameObject) continue;
-                if (p.gameObject == target.gameObject) continue;
+        //     target.PositionParity(this, _distances[target]);
+        // }
 
-                if (p.DistanceTo(this) + DistanceTo(target) < p.DistanceTo(target)  ||
-                    DistanceTo(target) + p.DistanceTo(target) < p.DistanceTo(this)  ||
-                    p.DistanceTo(target) + p.DistanceTo(this) < DistanceTo(target))
-                        _distances[p] = Mathf.Clamp(Mathf.Abs(p.DistanceTo(target) - DistanceTo(target)), 1f, 9f);
+        // private void SingularRetreat(Position target, float degree)
+        // {
+        //     _distances[target] += degree;
 
-                p.PositionParity(this, _distances[p]);
+        //     if (_distances[target] > 9f)
+        //         _distances[target] = 9f;
 
-                print("distance between " + p.gameObject.name + " and " + gameObject.name + " is now " + _distances[p]);
-            }
-        }
+        //     target.PositionParity(this, _distances[target]);
+        // }
 
-        private void AdjustAllPositioningRetreat(Position target, float degree)
-        {
-            var allPositions = FindObjectsOfType<Position>();
+        // public void PositionParity(Position mover, float distance)
+        // {
+        //     _distances[mover] = distance;
+        // }
 
-            foreach (var p in allPositions)
-            {
-                if (p.gameObject == gameObject) continue;
-                if (p.gameObject == target.gameObject) continue;
+        // private void AdjustAllPositioning(Position target, float degree)
+        // {
+        //     var allPositions = FindObjectsOfType<Position>();
 
-                if (p.DistanceTo(this) + DistanceTo(target) < p.DistanceTo(target))
-                    _distances[p] = p.DistanceTo(target) - DistanceTo(target);
+        //     foreach (var p in allPositions)
+        //     {
+        //         if (p.gameObject == gameObject) continue;
+        //         if (p.gameObject == target.gameObject) continue;
 
-                p.PositionParity(this, _distances[p]);
+        //         if (p.DistanceTo(this) + DistanceTo(target) < p.DistanceTo(target)  ||
+        //             DistanceTo(target) + p.DistanceTo(target) < p.DistanceTo(this)  ||
+        //             p.DistanceTo(target) + p.DistanceTo(this) < DistanceTo(target))
+        //                 _distances[p] = Mathf.Clamp(Mathf.Abs(p.DistanceTo(target) - DistanceTo(target)), 1f, 9f);
 
-                print("distance between " + p.gameObject.name + " and " + gameObject.name + " is now " + _distances[p]);
-            }
-        }
+        //         p.PositionParity(this, _distances[p]);
+        //     }
+        // }
     }
 }

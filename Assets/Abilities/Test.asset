@@ -12,37 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5056f39d68c010b40a4bd5a525232ddf, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: 
-  Name: Swift Strike
+  Name: Test
+  Keyword: test
   Description: 
   abilityFX: {fileID: 3595960919037275921, guid: 12d9de4e790cce342920521d8b5dd546, type: 3}
   ChannelTime: 0
-  ExhaustTime: 3
+  ExhaustTime: 0
   AbilityType: 0
-  TargetTypes: 01000000
-  TargetingMode: 1
-  RangeMin: 0
-  RangeMax: 3
-  Accuracy: 88.1
+  TargetTypes: 00000000
+  TargetingMode: 0
+  RangeType: 0
+  Accuracy: 0
   NoMiss: 0
-  ChangeNeutralState: 0
-  NeutralState: 3
+  Damaging: 1
+  ChangeStance: 0
+  Stance: 0
   AidType: 0
   IsMagical: 0
   MagicType: 0
   StatusEffect: 0
-  statusEffectDuration: 3
-  ChangeStatsSelf: 0
-  StatSelf: 0
-  StatSelfDegree: 0
+  statusEffectDuration: 0
   ChangeStatsTarget: 0
-  StatTarget: 0
-  StatTargetDegree: 0
   Reposition: 0
   Movement: 0
   MovementDegree: 0
   TrySignal: 0
   AttackVariant: 0
   Creation: 0
-  Trap: {fileID: 0}
-  Enemy: {fileID: 0}
   Obstacle: {fileID: 0}

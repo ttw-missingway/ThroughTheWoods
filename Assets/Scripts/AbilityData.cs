@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using TTW.Combat;
@@ -13,6 +9,7 @@ namespace TTW.Systems
     public class AbilityData : ScriptableObject
     {
         public string Name;
+        public string Keyword;
         public string Description;
         public AbilityFX abilityFX;
 
@@ -22,34 +19,32 @@ namespace TTW.Systems
         [EnumPaging, OnValueChanged("SetCurrentTool")]
         public AbilityType AbilityType;
 
-        private bool showTType => AbilityType != AbilityType.Create && AbilityType != AbilityType.Stance;
         private bool showTMode => AbilityType == AbilityType.Attack || AbilityType == AbilityType.Aid;
         private bool showAid => AbilityType == AbilityType.Aid;
+        private bool attackMode => AbilityType == AbilityType.Attack;
+        private bool showAccuracy => RangeType == RangeType.Ranged;
 
-        [ShowIf(nameof(showTType))]
-        public List<TargetType> TargetTypes;
+        public List<TargetingClass> TargetTypes;
 
         [ShowIf(nameof(showTMode))]
-        public TargetingMode TargetingMode;
+        public TargetScope TargetingMode;
 
-        [ShowIf(nameof(showTType))]
-        [PropertyRange(0, 10)]
-        public int RangeMin;
+        [ShowIf(nameof(attackMode))]
+        public RangeType RangeType;
 
-        [ShowIf(nameof(showTType))]
-        [PropertyRange(0, 10)]
-        public int RangeMax;
-
-        [ShowIf(nameof(showTType))]
+        [ShowIf(nameof(showAccuracy))]
         [PropertyRange(0, 100)]
         public float Accuracy;
 
-        [ShowIf(nameof(showTType))]
+        [ShowIf(nameof(showAccuracy))]
         public bool NoMiss;
 
-        public bool ChangeNeutralState;
-        [ShowIf(nameof(ChangeNeutralState))]
-        public Stance NeutralState;
+        [ShowIf(nameof(showTMode))]
+        public bool Damaging;
+
+        public bool ChangeStance;
+        [ShowIf(nameof(ChangeStance))]
+        public Stance Stance;
 
         [ShowIf(nameof(showAid))]
         public AidType AidType;
@@ -66,20 +61,8 @@ namespace TTW.Systems
         [ShowIf(nameof(statusEffectChecked))]
         public int statusEffectDuration;
 
-        public bool ChangeStatsSelf;
-
-        [ShowIf(nameof(ChangeStatsSelf))]
-        public Stat StatSelf;
-        [ShowIf(nameof(ChangeStatsSelf))]
-        public int StatSelfDegree;
-
         [ShowIf(nameof(showTMode))]
         public bool ChangeStatsTarget;
-
-        [ShowIf(nameof(ChangeStatsTarget))]
-        public Stat StatTarget;
-        [ShowIf(nameof(ChangeStatsTarget))]
-        public int StatTargetDegree;
 
         public bool Reposition;
         [ShowIf(nameof(Reposition))]
@@ -98,12 +81,6 @@ namespace TTW.Systems
         [ShowIf("AbilityType", AbilityType.Create)]
         public Creatable Creation;
 
-        [ShowIf("Creation", Creatable.Trap)]
-        public TrapData Trap;
-
-        [ShowIf("Creation", Creatable.Enemy)]
-        public EnemyData Enemy;
-
         [ShowIf("Creation", Creatable.Obstacle)]
         public ObstacleData Obstacle;
 
@@ -121,10 +98,15 @@ namespace TTW.Systems
         Attack,
         Aid,
         Effect,
-        Signal,
         Create,
         Stance,
         Movement
+    }
+
+    public enum RangeType
+    {
+        Melee,
+        Ranged
     }
 
     public enum AidType
@@ -133,19 +115,23 @@ namespace TTW.Systems
         Revive,
         Dispel
     }
-    public enum TargetType
+
+    public enum TargetingClass
     {
-        None,
-        Enemy,
-        Actor,
+        Foe,
+        Ally,
         Obstacle,
         Self,
         Down,
+    }
+
+    public enum TargetType{
+        Combatant,
+        Obstacle,
         Untargetable
     }
-    public enum TargetingMode
+    public enum TargetScope
     {
-        None,
         Single,
         Random,
         Area,
@@ -163,65 +149,63 @@ namespace TTW.Systems
     public enum StatusEffect
     {
         None,
-        Enraged, //can't change targets
+        Berserk, //can't change targets
         Stunned, //can't move or take an action
-        Burned, //chance of taking wound every action
+        Burned, //can't heal past wounded
         Wounded, //unable to perform certain actions
         Down, //must be revived, cannot be used in any way
         Madness, //performs abilities randomly
         Blind, //abilities are more likely to miss
-        Trapped, //can perform abilities but cannot move
+        Bound, //can perform abilities but cannot move
         Asleep, //cannot perform abilities or move until awoken either by chance or being hit
-        Bubble, //protected from damage until bubble pops
-        Genera, //chance of healing player every action
+        Bubble, //protected from an instance of damage
+        Genera, //auto heals wounds at start of turn
         Mirror, //reflects magic back to the caster
         Angel, //is automatically brought back to life once
-        Trance, //magic is cast without channel time
+        Trance, //special state, evasion, damage block, no cast times
         Mute, //cannot signal, cannot cast magic
         Phase, //cannot be targeted (can still be trapped, caught in area of effect or global attacks, hurt through status
-        Invulnerable, //cannot be hurt or killed, can still sustain damage effects, traps, etc.
-        Blur //evasion is raised;
+        IronClad, //cannot be hurt or killed, can still sustain damage effects, traps, etc.
+        Blur, //evasion is raised;
+        Isolated, //cannot be signalled to
+        Disarmed, //reduced to base abilities
+        Atrophy, //cooldowns and channels are longer
+        Dhyana, //always alert
+        Tailwind, //fast cooldowns
+        Homing, //won't miss
+        Behemoth //melee attacks become deadly
     }
     public enum Stance
     {
         None,
+        Wait, //keeps current stance if not none, and becomes alert if none
         Alert, //will attempt to evade damage, goes off gait
-        Guarding, //will attempt to block incoming damage, goes off grit
-        Vulnerable, //will not defend if attacked, is not aware of communication attempts
+        Guarding, //will attempt to block incoming damage
         Countering, //will defend with specific attack if attacked directly, is not aware of communication attempts
-        Signalling, //attempting to communicate, is on the lookout for communication
-        Coordinating, //is actively in communication with another actor, may be alerted if attacked
-        Protecting //takes damage as a proxy for whoever they are guarding
-    }
-    public enum Stat
-    {
-        None,
-        Heart,
-        Gait,
-        Grit,
-        Mind,
-        Spirit
+        Protecting, //takes damage as a proxy for whomever they are guarding
+        Cloaked //becomes untargetable, can still be hurt by area, global, or status damage
     }
     public enum Movement
     {
         //magic used in conjunction with movement will override gait limitations and result in a "warp"
         None,
         Advance,
-        Retreat
+        Retreat,
+        Reposition,
+        Swap
     }
     public enum Creatable
     {
         None,
-        Trap,
         Enemy,
         Obstacle
     }
     public enum AttackVariants
     {
+        None,
         Deadly, //has the potential to instantly kill
         GuardBreak, //will instantly kill a target who is guarding or protecting
         ChannelBreak, //will instantly kill a target who is channeling
         Vampire, //will heal a wounded attacker upon successful attack
-        QuickAttack, //may take no action time (cannot occur successively)
     }
 }

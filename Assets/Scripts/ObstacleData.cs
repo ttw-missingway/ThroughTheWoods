@@ -11,5 +11,6 @@ namespace TTW.Combat
     public class ObstacleData : ScriptableObject
     {
         public string Name;
+        public string Keyword;
     }
 }

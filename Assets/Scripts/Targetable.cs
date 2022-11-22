@@ -1,41 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TTW.Systems;
-using TTW.UI;
 using UnityEngine;
 
 namespace TTW.Combat
 {
     public class Targetable : MonoBehaviour
     {
-        [SerializeField] private TargetType _targetType;
-        TargetType _originalTargetType;
+        [SerializeField] public string Name;
+        [SerializeField] TargetType _targetType;
+        [SerializeField] string _keyword;
+        [SerializeField] GameObject _targetIcon;
         
         public Health Health { get; set; }
         public Position Position { get; set; }
-
         public TargetType TargetType => _targetType;
+        public string Keyword => _keyword;
+        TargetingTool tTool;
 
         private void Awake()
         {
             Health = GetComponent<Health>();
             Position = GetComponent<Position>();
-            _originalTargetType = _targetType;
+            tTool = new TargetingTool();
+        }
+
+        public void OpenTargetIcon(){
+            _targetIcon.SetActive(true);
+        }
+
+        public void CloseTargetIcon(){
+            _targetIcon.SetActive(false);
         }
 
         public void ReceiveAbility(Ability ability)
         {
-            if (!TargetingConditionsCheck()) return;
+            if (ability.AffectedTargets.Contains(this)) return;
+
+            if (!AccuracyCheck(ability)){
+                print("The ability missed!");
+                return;
+            }
+
+            if (Position.Distance == CombatDistance.Front 
+            && !ability.AoO 
+            && ability.TargetTypes.Contains(TargetingClass.Foe))
+                RequestAttackOfOpportunity(ability.Sender.Targetable);
+
+            if (Health.Stance == Stance.Countering)
+                CounterAttack(ability.Sender);
 
             //target manipulation is handled in here
             if (ability.StatusEffect != StatusEffect.None)
                 Health.CreateNewStatus(ability.StatusEffect, ability.StatusEffectDuration, canExpire: true);
 
-            if (ability.AbilityType == AbilityType.Attack)
-                Health.TakeDamage();
+            if (ability.Damaging){
+                if (Health.Stance == Stance.Guarding && !ability.IsMagical){
+                    print("ability blocked by guarding!");
+                }
+                else{
+                    Health.TakeDamage();
+                    print(Name + " took damage!");
+                }
+                Health.BreakStance();
+            }   
+
+            if (ability.AttackVariant == AttackVariants.Deadly){
+                Health.Death();
+            }
 
             if (ability.AbilityType == AbilityType.Aid)
             {
@@ -45,7 +77,6 @@ namespace TTW.Combat
                         Health.Heal();
                         break;
                     case AidType.Revive:
-                        print("revive");
                         Health.Revive();
                         break;
                     case AidType.Dispel:
@@ -55,60 +86,77 @@ namespace TTW.Combat
                         break;
                 }
             }
-        }
 
-        internal void ResetTargetType()
-        {
-            _targetType = _originalTargetType;
-        }
+            ability.AddAffectedTarget(this);
 
-        public void SelectTarget()
-        {
-            if (!TargetingConditionsCheck()) return;
-
-            CombatInstance.Current.SetTarget(this);
-            CombatInstance.Current.ExecuteAbility();
-        }
-
-        private bool TargetingConditionsCheck()
-        {
-            if (UISelectionController.Current.SelectionState != SelectionState.Target)
-            {
-                return false;
+            if (ability.TargetingMode == TargetScope.Area){
+                Position.AreaAttackToNeighbors(ability);
             }
-            if (!CombatInstance.Current.Ability.TargetTypes.Contains(_targetType))
-            {
-                print("cannot be targeted by this attack!");
-                return false;
+        }
+
+        private void CounterAttack(Combatant sender)
+        {
+            Targetable target = sender.Targetable;
+
+            if (GetComponent<Combatant>() != null)
+                GetComponent<Combatant>().CounterAttack(target);
+        }
+
+        private void ChangeStance(Stance stance)
+        {
+            Health.ChangeStance(stance);
+        }
+
+        private void RequestAttackOfOpportunity(Targetable target)
+        {
+            var aooRequest = new AoORequest(this, target);
+
+            foreach (Position p in Position.Neighbors){
+                if (p == null) continue;
+
+                if (p.GetComponent<Combatant>() != null){
+                    p.GetComponent<Combatant>().AooRequest(aooRequest);
+                }
             }
-            if (CombatInstance.Current.Focus.gameObject == gameObject)
-            {
-                if (!CombatInstance.Current.Ability.TargetTypes.Contains(TargetType.Self))
-                {
-                    print("cannot target self!");
+        }
+
+        public void SetKeyword(string keyword){
+            _keyword = keyword;
+        }
+
+        private bool AccuracyCheck(Ability ability)
+        {
+            var success = true;
+
+            if (Health.Stance == Stance.Alert && !ability.NoMiss){
+                if (DodgeRoll()){
+                    CombatWriter.Singleton.Write("Damage Dodged!");
                     return false;
                 }
             }
-            else
-            {
-                if (Position.DistanceTo(CombatInstance.Current.Focus.GetComponent<Position>()) > CombatInstance.Current.Ability.RangeMax)
-                {
-                    print("target is too far away!");
-                    return false;
-                }
-                if (Position.DistanceTo(CombatInstance.Current.Focus.GetComponent<Position>()) < CombatInstance.Current.Ability.RangeMin)
-                {
-                    print("target is too close!");
-                    return false;
+
+            if (ability.Range == RangeType.Ranged && !ability.NoMiss){
+                float random = UnityEngine.Random.Range(0f, 100f);
+                print("accuracy roll: " + random);
+                if (random > ability.Accuracy){
+                    success = false;
+                    CombatWriter.Singleton.Write("Attack Missed!");
                 }
             }
 
-            return true;
+            return success;
         }
 
-        public void SetTargetType(TargetType targetType)
+        private bool DodgeRoll()
         {
-            _targetType = targetType;
+            var baseChance = 40f;
+            var random = UnityEngine.Random.Range(0f, 100f);
+
+            if (random < baseChance){
+                return true;
+            }
+
+            return false;
         }
     }
 }

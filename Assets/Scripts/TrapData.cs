@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace TTW.Combat
+namespace TTW.Systems
 {
     public class TrapData : ScriptableObject
     {
+        public string Keyword;
     }
 }
