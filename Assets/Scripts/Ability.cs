@@ -7,8 +7,8 @@ namespace TTW.Combat
     {
         public List<TargetingClass> TargetTypes { get; set; }
         public TargetScope TargetingMode { get; set; }
-        public List<Targetable> CurrentTargets { get; set; }
-        public List<Targetable> AffectedTargets { get; set; }
+        public List<Targetable> CurrentTargets { get; set; } //list of targets that will receive this ability
+        public List<Targetable> AffectedTargets { get; set; } //list of targets that have already been affected by this ability
         public bool Damaging { get; set; }
         public RangeType Range { get; set; }
         public int ChannelTime { get; set; }
@@ -19,7 +19,6 @@ namespace TTW.Combat
         public bool NoMiss { get; set; }
         public bool ChangeStance { get; set; }
         public Stance Stance { get; set; }
-        public bool IsMagical { get; set; }
         public MagicType MagicType { get; set; }
         public StatusEffect StatusEffect { get; set; }
         public int StatusEffectDuration { get; set; }
@@ -31,7 +30,7 @@ namespace TTW.Combat
         public ObstacleData Obstacle { get; set; }
         public Combatant Sender { get; set; }
         public AidType AidType { get; set; }
-        public bool AoO { get; set; }
+        public bool AoO { get; set; } 
 
         public Ability (AbilityData data, Combatant sender)
         {
@@ -49,7 +48,6 @@ namespace TTW.Combat
             NoMiss = data.NoMiss;
             ChangeStance = data.ChangeStance;
             Stance = data.Stance;
-            IsMagical = data.IsMagical;
             MagicType = data.MagicType;
             StatusEffect = data.StatusEffect;
             StatusEffectDuration = data.statusEffectDuration;
@@ -68,7 +66,7 @@ namespace TTW.Combat
             AffectedTargets.Add(target);
         }
 
-        public void AttackOfOpprotunity(){
+        public void AttackOfOpportunity(){
             AoO = true;
         }
 

@@ -9,40 +9,43 @@ namespace TTW.Combat
     {
         [SerializeField] ActorData _actor;
         [SerializeField] public List<AbilityData> Abilities = new List<AbilityData>();
-        [SerializeField] int _exhaust = 0;
-        [SerializeField] int _channel = 0;
-        [SerializeField] bool _exhausted;
-        [SerializeField] bool _channeling;
-        [SerializeField] public bool Tapped = false;
         [SerializeField] Ability _channeledAbility;
         [SerializeField] List<Targetable> _channelTargets = new List<Targetable>();
         [SerializeField] GameObject _attackIcon;
-        public Targetable Targetable { get; private set; }
-        public bool Exhausted => _exhausted;
-        public int ExhaustTime => _exhaust;
-        public bool Channeling => _channeling;
-        public int ChannelTime => _channel;
+
         public ActorData Actor => _actor;
-
-        public Position Position { get; set; }
-
+        Position _position;
+        Targetable _targetable;
+        public Position Position => _position;
+        public Targetable Targetable => _targetable;
         public event EventHandler onExhaustUpdate;
         AbilityQueue _abilityQueue;
         LinkLibrary _linkLibrary;
         LinkLibrary.LinkClass _linkClass = LinkLibrary.LinkClass.Ability;
+        EventBroadcaster _eventBroadcaster;
+        Health _health;
+        public Health Health => _health;
+        Exhaust _exhaust;
+        Channel _channel;
+        TargetingTool _tTool;
 
         private void Awake()
         {
-            Position = GetComponent<Position>();
-            Targetable = GetComponent<Targetable>();
+            _position = GetComponent<Position>();
+            _health = GetComponent<Health>();
+            _targetable = GetComponent<Targetable>();
             _abilityQueue = CombatManager.Current.GetComponent<AbilityQueue>();
-            _linkLibrary = LinkLibrary.Current;
+            _linkLibrary = CombatManager.Current.LinkLibrary;
+            _tTool = new TargetingTool();
             RegisterAbilities();
         }
 
         private void Start()
         {
-            EventBroadcaster.Current.EndTurn += _OnTurnEnd;
+            _exhaust = _health.Exhaust;
+            _channel = _health.Channel;
+            _eventBroadcaster = CombatManager.Current.EventBroadcaster;
+            _eventBroadcaster.EndTurn += _OnTurnEnd;
         }
 
         private void RegisterAbilities(){
@@ -59,67 +62,52 @@ namespace TTW.Combat
             _attackIcon.SetActive(false);
         }
 
-        private void Tap(bool tapped)
-        {
-            Tapped = tapped;
-        }
-
-        public void EmptyTurn(){
-            Tap(true);
-        }
-
         private void _OnTurnEnd(object sender, EventArgs e)
         {
-            Tap(false);
+            Health.Tap(false);
         }
 
-        public void PerformChanneledAbility()
-        {
-            print(this + " is performing channeled ability " + _channeledAbility.AbilityData.name);
-            var tTool = new TargetingTool();
+        // public void PerformChanneledAbility()
+        // {
+        //     print(this + " is performing channeled ability " + _channeledAbility.AbilityData.name);
+        //     var tTool = new TargetingTool();
 
-            foreach (Targetable t in _channelTargets){
-                if (!tTool.TargetingConditionsCheck(this, t, _channeledAbility.AbilityData, true)){
-                    _channelTargets.Remove(t);
+        //     foreach (Targetable t in _channelTargets){
+        //         if (!tTool.TargetingConditionsCheck(this, t, _channeledAbility.AbilityData, true)){
+        //             _channelTargets.Remove(t);
+        //         }
+        //     }
+
+        //     SendAbility(_channelTargets, _channeledAbility);
+        //     _channeling = false;
+        //     _channeledAbility = null;
+        //     _channelTargets.Clear();
+        // }
+
+        public void SendAbility(Ability ability)
+        {
+            var desiredTargets = new List<Targetable>(ability.CurrentTargets);
+
+            foreach(Targetable t in desiredTargets){
+                print(t.Name);
+            }
+
+            ability.ClearTargets();
+            foreach(Targetable t in desiredTargets){
+                if (_tTool.TargetingConditionsCheck(this, t, ability.AbilityData, true)){
+                    ability.AddTarget(t);
                 }
             }
 
-            SendAbility(_channelTargets, _channeledAbility);
-            _channeling = false;
-            _channeledAbility = null;
-            _channelTargets.Clear();
-        }
-
-        private void SendAbility(List<Targetable> targets, Ability ability)
-        {
-            ability.ClearTargets();
-            foreach(Targetable t in targets){
-                ability.AddTarget(t);
-            }
-            print("adding ability by " + Targetable.Name + " to queue");
             _abilityQueue.AddAbility(ability);
-            Tap(true);
+            Health.Tap(true);
         }
 
         internal void CounterAttack(Targetable target)
         {
             Ability counter = new Ability(CombatManager.Current.CounterAttack, this);
-            List<Targetable> targets = new List<Targetable>();
-            targets.Add(target);
-            SendAbility(targets, counter);
-        }
-
-        public void ReduceChannelTime(){
-            _channel--;
-            if (_channel <= 0){ _channel = 0;}
-        }
-
-        public void ReduceExhaustTime(){
-            _exhaust--;
-            if (_exhaust <= 0){
-                _exhaust = 0;
-                _exhausted = false;
-            } 
+            counter.CurrentTargets.Add(target);
+            SendAbility(counter);
         }
 
         public void AooRequest(AoORequest request){
@@ -157,22 +145,21 @@ namespace TTW.Combat
         public void ExecuteAoO(Targetable target){
             var aooData = CombatManager.Current.AttackOfOpportunity;
             Ability aoo = new Ability(aooData, this);
-            aoo.AttackOfOpprotunity();
-            List<Targetable> targets = new List<Targetable>();
+            aoo.AttackOfOpportunity();
+            aoo.CurrentTargets.Add(target);
 
-            targets.Add(target);
-
-            SendAbility(targets, aoo);
+            SendAbility(aoo);
         }
 
-        public void ReceiveAbility(Ability ability, List<Targetable> targets)
+        //Can this be moved elsewhere?
+        public void ReceiveAbility(Ability ability)
         {
             if (ability.ExhaustTime > 0){
-                SetExhaust(ability);
+                _exhaust.SetCountDown(ability.ExhaustTime);
             }
                 
             if (ability.ChannelTime > 0){
-                SetChannel(ability, targets);
+                _channel.StartChannel(ability.ChannelTime, ability);
                 return;
             }
 
@@ -182,26 +169,20 @@ namespace TTW.Combat
             //     Reposition(targets[0], ability);
             // }
 
-            SendAbility(targets, ability);
+            SendAbility(ability);
         }
 
-        private void SetChannel(Ability ability, List<Targetable> targets)
-        {
-            _channel = ability.ChannelTime;
-            _channeledAbility = ability;
-            foreach (Targetable t in targets)
-            {
-                _channelTargets.Add(t);
-            }
-            _channeling = true;
-            EventBroadcaster.Current.Channeler.AddToChannelOrder(this);
-        }
-
-        private void SetExhaust(Ability ability)
-        {
-                _exhaust = ability.ExhaustTime;
-                _exhausted = true;
-        }
+        // private void SetChannel(Ability ability, List<Targetable> targets)
+        // {
+        //     _channel = ability.ChannelTime;
+        //     _channeledAbility = ability;
+        //     foreach (Targetable t in targets)
+        //     {
+        //         _channelTargets.Add(t);
+        //     }
+        //     _channeling = true;
+        //     _eventBroadcaster.Channeler.AddToChannelOrder(this);
+        // }
 
         private void ChangeStance(Ability ability)
         {

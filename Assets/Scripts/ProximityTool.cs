@@ -19,7 +19,7 @@ public class ProximityTool
         if (!ChainConditions(posA)) return;
 
         List<Position> AllPositions = MonoBehaviour.FindObjectsOfType<Position>()
-                                        .Where(p => p.PlayingFieldSide == posA.PlayingFieldSide)
+                                        .Where(p => p.CombatSide == posA.CombatSide)
                                         .OrderBy(p => p.OrderNo)
                                         .ToList();
 
@@ -50,28 +50,6 @@ public class ProximityTool
     }
 
     private bool ChainConditions(Position p){
-        if (p.GetComponent<Targetable>().TargetType == TargetType.Obstacle){
-            return false;
-        } 
-        if (p.Distance != CombatDistance.Front){
-            return false;
-        }
-        if (p.GetComponent<Health>().StatusExists(StatusEffect.Isolated)){
-            return false;
-        }
-        if (p.GetComponent<Health>().StatusExists(StatusEffect.Trance)){
-            return false;
-        }
-        if (p.GetComponent<Health>().StatusExists(StatusEffect.Down)){
-            return false;
-        }
-        if (p.GetComponent<Combatant>().Exhausted){
-            return false;
-        }  
-        if (p.GetComponent<Combatant>().Channeling){
-            return false;
-        }  
-
-        return true;
+        return p.Health.PassesChainConditions();
     }
 }

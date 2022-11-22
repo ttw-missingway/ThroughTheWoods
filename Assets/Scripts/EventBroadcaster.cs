@@ -6,22 +6,18 @@ using UnityEngine;
 namespace TTW.Combat {
     public class EventBroadcaster : MonoBehaviour
     {
-        public static EventBroadcaster Current;
         [SerializeField] CombatManager _manager;
-        [SerializeField] ChannelingSurrogate _channeler;
-        public ChannelingSurrogate Channeler => _channeler;
         public event EventHandler EndTurn;
+        public event EventHandler StartTurnAlly;
+        public event EventHandler StartTurnEnemy;
         public event EventHandler StartTurn;
         public event EventHandler EndAction;
         private bool _endOfActionFlag = false;
         public bool EndOfActionFlag => _endOfActionFlag;
 
-        private void Awake(){
-            Current = this;
-        }
-
         private void EndEventPhase()
         {
+            print("end of event phase");
             _manager.ChangeState(CombatState.Control);
         }
 
@@ -31,8 +27,7 @@ namespace TTW.Combat {
 
         public void StartEventPhase()
         {
-            ReduceExhaustAndChannel();
-
+            print("Start of Event Phase");
             if (!CheckForEvents())
             {
                 EndEventPhase();
@@ -40,50 +35,47 @@ namespace TTW.Combat {
             }
             else
             {
-                _channeler.CallChannel(_manager.Turn);
+                //perform events
             }
         }
 
-        private void ReduceExhaustAndChannel()
+        private void CallStartTurn()
         {
             if (_manager.Turn == CombatSide.Ally)
             {
-                foreach (Combatant c in _manager.Allies)
-                {
-                    c.ReduceChannelTime();
-                    c.ReduceExhaustTime();
-                }
+                print("start of turn: Ally");
+                StartTurnAlly?.Invoke(this, EventArgs.Empty);
             }
             else
             {
-                foreach (Combatant c in _manager.Enemies)
-                {
-                    c.ReduceChannelTime();
-                    c.ReduceExhaustTime();
-                }
+                print("start of turn: Enemy");
+                StartTurnEnemy?.Invoke(this, EventArgs.Empty);
             }
+
+            StartTurn?.Invoke(this, EventArgs.Empty);
         }
 
         private bool CheckForEvents()
         {
-           if (_channeler.CheckForEvents(_manager.Turn)) return true;
+           //check for events, return true if
+
             return false;
         }
 
         public void EndOfAnimation(){
-            if (_manager.State == CombatState.Event){
-                if (_channeler.EndOfChannel(_manager.Turn)){
-                        EndEventPhase();
-                    } 
-            }
-            else{
-                if (_endOfActionFlag){
+            // if (_manager.State == CombatState.Event){
+            //     EndEventPhase();
+            // }
+            if (_manager.State == CombatState.Control){
+                if (_manager.NoCombatantsRemaining()){
+                    print("end of turn");
+                    CallEndTurn();
+                }
+                else if (_endOfActionFlag){
+                    print("end of action");
                     _manager.ChangeState(CombatState.Control);
                     CallEndOfAction();
                 }
-            }
-            if (_manager.Turn == CombatSide.Ally){
-                GetComponent<CombatReader>().PC.StartOfTurn();
             }
         }
 
@@ -93,10 +85,6 @@ namespace TTW.Combat {
 
         public void CallEndTurn(){
             EndTurn?.Invoke(this, EventArgs.Empty);
-        }
-
-        public void CallStartTurn(){
-            StartTurn?.Invoke(this, EventArgs.Empty);
         }
     }
 }

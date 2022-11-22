@@ -114,8 +114,8 @@ namespace TTW.Combat{
 
         private bool ValidTargetType(TargetingClass targetingClass, Combatant sender, Targetable receiver){
             bool value = false;
-            var senderSide = sender.Position.PlayingFieldSide;
-            var receiverSide = receiver.Position.PlayingFieldSide;
+            var senderSide = sender.Position.CombatSide;
+            var receiverSide = receiver.Position.CombatSide;
 
             bool isDown = receiver.Health.StatusExists(StatusEffect.Down);
             bool isObstacle = receiver.TargetType == TargetType.Obstacle;

@@ -11,8 +11,8 @@ namespace TTW.Systems{
         PlayerController pc;
         string _linkId = "";
 
-        public void Start(){
-            library = GameObject.FindGameObjectWithTag("Master").GetComponent<LinkLibrary>();
+        private void Start(){
+            library = CombatManager.Current.LinkLibrary;
             pc = GameObject.FindObjectOfType<PlayerController>();
         }
 

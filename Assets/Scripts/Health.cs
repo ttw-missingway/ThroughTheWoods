@@ -15,8 +15,16 @@ namespace TTW.Combat
     {
         [SerializeField] private List<Status> _statusEffects = new List<Status>();
         [SerializeField] private Stance _currentStance = Stance.None;
+        [SerializeField] private Exhaust _exhaust;
+        [SerializeField] private Channel _channel;
+        [SerializeField] private bool _tapped;
         public List<Status> StatusEffects => _statusEffects;
         public Stance Stance => _currentStance;
+        public Exhaust Exhaust => _exhaust;
+        public Channel Channel => _channel;
+        public bool Exhausted => _exhaust.Exhausted;
+        public bool Channeling => _channel.Channeling;
+        public bool Tapped => _tapped;
 
         // [SerializeField] private RectTransform _uiStatusContainer;
         [SerializeField] private UIStatus _statusPrefab;
@@ -24,16 +32,92 @@ namespace TTW.Combat
         [SerializeField] TMP_Text _display;
 
         EventBroadcaster _eventBroadcast;
+        Position _position;
+        Targetable _targetable;
+        Combatant _combatant;
 
+        private void Awake()
+        {
+            _position = GetComponent<Position>();
+            _targetable = GetComponent<Targetable>();
+            _combatant = GetComponent<Combatant>();
+            _exhaust = new Exhaust(_position.CombatSide);
+            _channel = new Channel(_position.CombatSide, _combatant);
+        }
 
         private void Start()
         {
             // _combInst = CombatManager.Current;
             // _combInst.OnTurnEnd += _combInst_OnActionEnd;
-
-            _eventBroadcast = EventBroadcaster.Current;
+            _eventBroadcast = CombatManager.Current.EventBroadcaster;
             _eventBroadcast.EndTurn += _combInst_OnActionEnd;
+            
             UpdateDisplay();
+        }
+
+        public void Tap(bool tap){
+            _tapped = tap;
+        }
+
+        public bool PassesChainConditions(){
+            if (_targetable.TargetType == TargetType.Obstacle){
+                return false;
+            } 
+            if (_position.Distance != CombatDistance.Front){
+                return false;
+            }
+            if (StatusExists(StatusEffect.Isolated)){
+                return false;
+            }
+            if (StatusExists(StatusEffect.Trance)){
+                return false;
+            }
+            if (StatusExists(StatusEffect.Down)){
+                return false;
+            }
+            if (Exhausted){
+                return false;
+            }  
+            if (Channeling){
+                return false;
+            }  
+
+            return true;
+        }
+
+        public bool PassesActionConditions(bool writeReason){
+            string reason = "";
+            bool returnValue = true;
+
+            if (StatusExists(StatusEffect.Down)){
+                reason += "\n" + _targetable.Name + " is not available because they are down";
+                returnValue = false;
+            } 
+            if (StatusExists(StatusEffect.Stunned)){
+                reason += "\n" + _targetable.Name + " is not available because they are stunned";
+                returnValue = false;
+            } 
+            if (StatusExists(StatusEffect.Asleep)){
+                reason += "\n" + _targetable.Name + " is not available because they are asleep";
+                returnValue = false;
+            } 
+            if (Tapped){
+                reason += "\n" + _targetable.Name + " is not available because they are tapped";
+                returnValue = false;
+            } 
+            if (Exhausted){
+                reason += "\n" + _targetable.Name + " is not available because they are exhausted";
+                returnValue = false;
+            } 
+            if (Channeling){
+                reason += "\n" + _targetable.Name + " is not available because they are channeling";
+                returnValue = false;
+            } 
+
+            if (writeReason)
+                print(reason);
+            
+            return returnValue;
         }
 
         private void _combInst_OnActionEnd(object sender, EventArgs e)
@@ -80,8 +164,8 @@ namespace TTW.Combat
                 _display.text += "\n" + s.StatusEffect;
             }
             _display.text += "\n" + _currentStance;
-            _display.text += "\n" + "Exhaust: " + GetComponent<Combatant>().Exhausted;
-            _display.text += "\n" + "Channel: " + GetComponent<Combatant>().Channeling;
+            _display.text += "\n" + "Exhaust: " + _exhaust.ExhaustTime;
+            _display.text += "\n" + "Channel: " + _channel.ChannelTime;
         }
 
         private void RemoveStatusEffect(Status stat)

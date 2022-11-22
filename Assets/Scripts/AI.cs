@@ -8,7 +8,8 @@ namespace TTW.Combat
 {
     public class AI : MonoBehaviour
     {
-        [SerializeField] CombatManager _combatManager;
+        CombatManager _combatManager;
+        EventBroadcaster _eventBroadcaster;
         [SerializeField] PlayerTurn _currentTurn;
         [SerializeField] Combatant _selectedEnemy;
         [SerializeField] AbilityData _selectedAbility;
@@ -21,30 +22,33 @@ namespace TTW.Combat
 
         private void Start()
         {
+            _combatManager = CombatManager.Current;
+            _eventBroadcaster = _combatManager.EventBroadcaster;
             tTool = new TargetingTool();
             cTool = new CheckingTool();
             _availableEnemies = cTool.GetAvailableEnemies(_combatManager.Enemies);
-            EventBroadcaster.Current.StartTurn += _OnTurnStart;
-            EventBroadcaster.Current.EndAction += _OnActionEnd;
+            _eventBroadcaster.StartTurn += _OnTurnStart;
+            _eventBroadcaster.EndAction += _OnActionEnd;
         }
 
         private void _OnActionEnd(object sender, EventArgs e)
         {
             if (_combatManager.Turn == CombatSide.Enemy && _combatManager.State == CombatState.Control){
-                StartOfTurn();
+                PerformAction();
             }
         }
 
         private void _OnTurnStart(object sender, EventArgs e)
         {
             if (_combatManager.Turn == CombatSide.Enemy && _combatManager.State == CombatState.Control){
-                StartOfTurn();
+                PerformAction();
             }
         }
 
-        public void StartOfTurn(){
+        public void PerformAction(){
             _availableEnemies = cTool.GetAvailableEnemies(_combatManager.Enemies);
-            var _shuffledList = Shuffle<Combatant>(_availableEnemies, _availableEnemies.Count);
+            TTWMath math = new TTWMath();
+            var _shuffledList = math.Shuffle<Combatant>(_availableEnemies, _availableEnemies.Count);
 
             foreach (Combatant a in _shuffledList){
                 var _availableAbilities = tTool.FilterAbilities(a, a.Abilities);
@@ -58,25 +62,17 @@ namespace TTW.Combat
                 _selectedTargets.Add(_availableTargets[randomTarget]);
 
                 var ability = new Ability(_selectedAbility, a);
-                a.ReceiveAbility(ability, _selectedTargets);
+
+                foreach (Targetable t in _selectedTargets){
+                    ability.CurrentTargets.Add(t);
+                }
+
+                a.ReceiveAbility(ability);
                 Clear();
                 return;
             }
 
             EndTurn();
-        }
-
-        public IEnumerable<T> Shuffle<T>(IEnumerable<T> list, int size)
-        {
-            var r = new System.Random();
-            var shuffledList = 
-                list.
-                    Select(x => new { Number = r.Next(), Item = x }).
-                    OrderBy(x => x.Number).
-                    Select(x => x.Item).
-                    Take(size);
-
-            return shuffledList.ToList();
         }
 
         private void EndTurn(){

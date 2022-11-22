@@ -17,16 +17,27 @@ namespace TTW.Combat
     {
         [SerializeField] CombatDistance _distance;
         [SerializeField] int _orderNo;
-        [SerializeField] CombatSide _playingFieldSide;
+        [SerializeField] CombatSide _combatSide;
 
         [SerializeField] Position _leftNeighbor;
         [SerializeField] Position _rightNeighbor;
 
         public Position[] Neighbors = new Position[2];
-        public CombatSide PlayingFieldSide => _playingFieldSide;
+        public CombatSide CombatSide => _combatSide;
 
         public CombatDistance Distance => _distance;
         public int OrderNo => _orderNo;
+
+        Health _health;
+        public Health Health => _health;
+
+        public void Awake(){
+            _health = GetComponent<Health>();
+        }
+
+        public void SetCombatSide(CombatSide side){
+            _combatSide = side;
+        }
 
         public void SetPositionOrder(List<Position> list, int index){
             _orderNo = index + 1;

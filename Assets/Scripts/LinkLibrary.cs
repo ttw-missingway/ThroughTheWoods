@@ -9,11 +9,6 @@ namespace TTW.Systems{
     {
         [SerializeField]
         private List<LinkData> links = new List<LinkData>();
-        public static LinkLibrary Current;
-
-        private void Awake(){
-            Current = this;
-        }
 
         public void AddLink(string linkId, LinkClass linkClass, ScriptableObject data){
             var matchingLinks = links.Where(l => l.Keyword == linkId);

@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -48,12 +46,14 @@ namespace TTW.Combat{
             foreach(Combatant a in _actors){
                 var realA = Instantiate(a, new Vector3(actorSpacing * count, _actorBin.transform.position.y, 0f), Quaternion.identity, _actorBin.transform);
                 _manager.AddActor(realA);
+                realA.Position.SetCombatSide(CombatSide.Ally);
                 count++;
             }
             count=0;
             foreach(Combatant e in _enemies){
                 var realE = Instantiate(e, new Vector3(-7.6f + (enemySpacing * count), _enemyBin.transform.position.y, 0f), Quaternion.identity, _enemyBin.transform);
                 _manager.AddEnemy(realE);
+                realE.Position.SetCombatSide(CombatSide.Enemy);
                 count++;
             }
             foreach(Targetable o in _objects){

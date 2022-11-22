@@ -55,7 +55,7 @@ namespace TTW.Combat
                 Health.CreateNewStatus(ability.StatusEffect, ability.StatusEffectDuration, canExpire: true);
 
             if (ability.Damaging){
-                if (Health.Stance == Stance.Guarding && !ability.IsMagical){
+                if (Health.Stance == Stance.Guarding && ability.MagicType == MagicType.None){
                     print("ability blocked by guarding!");
                 }
                 else{

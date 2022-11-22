@@ -183,7 +183,7 @@ namespace TTW.Systems
         Guarding, //will attempt to block incoming damage
         Countering, //will defend with specific attack if attacked directly, is not aware of communication attempts
         Protecting, //takes damage as a proxy for whomever they are guarding
-        Cloaked //becomes untargetable, can still be hurt by area, global, or status damage
+        Cloaked, //becomes untargetable, can still be hurt by area, global, or status damage
     }
     public enum Movement
     {

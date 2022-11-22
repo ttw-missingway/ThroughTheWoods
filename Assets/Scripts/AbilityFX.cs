@@ -35,20 +35,6 @@ namespace TTW.Combat
             _psSystem.Play();
         }
 
-        public void OpenIcons(){
-            _ability.Sender.OpenAttackIcon();
-            foreach(Targetable t in _targets){
-                t.OpenTargetIcon();
-            }
-        }
-
-        public void CloseIcons(){
-            _ability.Sender.CloseAttackIcon();
-            foreach (Targetable t in _targets){
-                t.CloseTargetIcon();
-            }
-        }
-
         public void SendAbilityData(){
             foreach(Targetable t in _targets){
                 t.ReceiveAbility(_ability);
@@ -58,7 +44,7 @@ namespace TTW.Combat
         public void End()
         {
             MarkedForDeletion = true;
-            EventBroadcaster.Current.EndOfAnimation();
+            _instance.EventBroadcaster.EndOfAnimation();
             EndOfFX?.Invoke(this, EventArgs.Empty);
             Destroy(gameObject);
         }

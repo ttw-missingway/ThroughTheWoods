@@ -16,6 +16,15 @@ public class AbilityQueue : MonoBehaviour
         broadcaster = GetComponent<EventBroadcaster>();
     }
 
+    private void Start(){
+        broadcaster.EndAction += OnEndAction;
+    }
+
+    private void OnEndAction(object sender, EventArgs e)
+    {
+        LaunchAbility();
+    }
+
     public int QueueCount => Abilities.Count;
 
     public void AddAbility(Ability ability){
@@ -23,20 +32,21 @@ public class AbilityQueue : MonoBehaviour
         Abilities.Enqueue(ability);
         _abilitiesCount = Abilities.Count;
 
-        if (ReadyToLaunch())
+        if (ReadyToLaunch()) 
             LaunchAbility();
     }
 
     public void LaunchAbility(){
-        if (Abilities.Count == 0) return;
+        if (Abilities.Count == 0) 
+            return;
 
         var launch = Abilities.Dequeue();
         _abilitiesCount = Abilities.Count;
 
         var fx = Instantiate(launch.AbilityData.abilityFX);
-        if (_abilitiesCount == 0)
+        if (_abilitiesCount == 0) 
             broadcaster.ReadyForNewActionChain(true);
-        fx.EndOfFX += OnFXEnd;
+        // fx.EndOfFX += OnFXEnd;
         fx.SetAbility(launch);
     }
 
@@ -45,15 +55,14 @@ public class AbilityQueue : MonoBehaviour
         var effects = FindObjectsOfType<AbilityFX>();
         var animationsInScene = effects.Where(a => a.MarkedForDeletion == false).ToList();
 
-        if (animationsInScene.Count == 0){
+        if (animationsInScene.Count == 0) 
             ready = true;
-        }
 
         return ready;
     }
 
-    private void OnFXEnd(object sender, EventArgs e)
-    {
-        LaunchAbility();
-    }
+    // private void OnFXEnd(object sender, EventArgs e)
+    // {
+    //     LaunchAbility();
+    // }
 }

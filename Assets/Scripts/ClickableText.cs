@@ -8,10 +8,11 @@ using UnityEngine.EventSystems;
 namespace TTW.Systems{
     public class ClickableText : MonoBehaviour, IPointerClickHandler
     {
-        [SerializeField] LinkLibrary library;
+        LinkLibrary library;
         PlayerController pc;
 
-        private void Awake(){
+        private void Start(){
+            library = CombatManager.Current.LinkLibrary;
             pc = GameObject.FindObjectOfType<PlayerController>();
         }
 

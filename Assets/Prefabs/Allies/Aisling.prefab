@@ -157,10 +157,9 @@ MonoBehaviour:
   _actor: {fileID: 11400000, guid: 03db413695706ba43ac927ad718cf3fd, type: 2}
   Abilities:
   - {fileID: 11400000, guid: d7209b44ce8552740b15985e6d3344ac, type: 2}
-  _exhaust: 0
-  _channel: 0
-  _exhausted: 0
-  _channeling: 0
+  - {fileID: 11400000, guid: cd52f54eb0aeb2f428832375a7a31430, type: 2}
+  - {fileID: 11400000, guid: e5390a11786cac34f9fe3f998e5ab12b, type: 2}
+  - {fileID: 11400000, guid: 188f075565801e445ac1f871b020f4e8, type: 2}
   Tapped: 0
   _channelTargets: []
   _attackIcon: {fileID: 5552107942826837214}
@@ -178,7 +177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _distance: 0
   _orderNo: 0
-  _playingFieldSide: 0
+  _combatSide: 0
   _leftNeighbor: {fileID: 0}
   _rightNeighbor: {fileID: 0}
   Neighbors:
@@ -198,6 +197,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _statusEffects: []
   _currentStance: 2
+  _exhaust:
+    _turns: 0
+    _exhausted: 0
+    _combatSide: 0
+  _channel:
+    _turns: 0
+    _channeling: 0
+    _combatSide: 0
+  _tapped: 0
   _statusPrefab: {fileID: 0}
   _display: {fileID: 8159389055120256091}
 --- !u!114 &9062938404935645665

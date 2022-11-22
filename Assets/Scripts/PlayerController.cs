@@ -28,20 +28,26 @@ namespace TTW.Combat{
         [SerializeField] List<Targetable> _availableTargets;
         [SerializeField] List<Targetable> _selectedTargets = new List<Targetable>();
 
-        TargetingTool tTool;
-        CheckingTool cTool;
+        TargetingTool _tTool;
+        CheckingTool _cTool;
+
+        EventBroadcaster _events;
 
         private void Start()
         {
-            StartOfTurn();
+            _tTool = new TargetingTool();
+            _cTool = new CheckingTool();
+            _combatManager = CombatManager.Current;
+            _events = _combatManager.GetComponent<EventBroadcaster>();
+            _events.EndAction += StartOfAction;
         }
 
-        public void StartOfTurn()
+        public void StartOfAction(object o, EventArgs e)
         {
+            if (_combatManager.Turn != CombatSide.Ally) return;
+
             CombatWriter.Singleton.Write("Select An Actor!");
-            tTool = new TargetingTool();
-            cTool = new CheckingTool();
-            _availableActors = cTool.GetAvailableActors(_combatManager.Allies);
+            _availableActors = _cTool.GetAvailableActors(_combatManager.Allies);
             
 
             if (_availableActors.Count == 0){
@@ -77,15 +83,15 @@ namespace TTW.Combat{
         {
             if (link.LinkClass == LinkLibrary.LinkClass.Enemy || link.LinkClass == LinkLibrary.LinkClass.Ally || link.LinkClass == LinkLibrary.LinkClass.Object)
             {
-                var availableTargets = tTool.FilterTargetables(_selectedActor, _selectedAbility, false);
+                var availableTargets = _tTool.FilterTargetables(_selectedActor, _selectedAbility, false);
                 var matchingTarget = availableTargets.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
                 if (matchingTarget != null)
                 {
                     _selectedTargets.Add(matchingTarget);
                 }
                 else{
-                    var failedTarget = tTool.AllTargetables.Where(t => t.Keyword == link.Keyword).FirstOrDefault();
-                    tTool.TargetingConditionsCheck(_selectedActor, failedTarget, _selectedAbility, writeReason: true);
+                    var failedTarget = _tTool.AllTargetables.Where(t => t.Keyword == link.Keyword).FirstOrDefault();
+                    _tTool.TargetingConditionsCheck(_selectedActor, failedTarget, _selectedAbility, writeReason: true);
                     return;
                 }
 
@@ -120,7 +126,7 @@ namespace TTW.Combat{
         {
             if (link.LinkClass == LinkLibrary.LinkClass.Ally)
             {
-                _availableActors = cTool.GetAvailableActors(_combatManager.Allies);
+                _availableActors = _cTool.GetAvailableActors(_combatManager.Allies);
 
                 var matchingActor = _availableActors.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
                 if (matchingActor != null)
@@ -130,7 +136,7 @@ namespace TTW.Combat{
                 }
                 else{
                     var failedActor = _combatManager.Allies.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
-                    cTool.IsAvailable(failedActor, writeReason: true);
+                    _cTool.IsAvailable(failedActor, writeReason: true);
                 }
             }
         }
@@ -158,13 +164,13 @@ namespace TTW.Combat{
         }
 
         private void RandomTarget(AbilityData ability){
-            var targetables = tTool.FilterTargetables(_selectedActor, ability, false);
+            var targetables = _tTool.FilterTargetables(_selectedActor, ability, false);
             var randomInt = UnityEngine.Random.Range(0, targetables.Count);
             _selectedTargets.Add(targetables[randomInt]);
         }
 
         private void GlobalTargets(AbilityData ability){
-            var targetables = tTool.FilterTargetables(_selectedActor, ability, false);
+            var targetables = _tTool.FilterTargetables(_selectedActor, ability, false);
             foreach(Targetable t in targetables){
                 _selectedTargets.Add(t); 
             }
@@ -302,7 +308,12 @@ namespace TTW.Combat{
             if (!commenseExecute) return;
     
             var ability = new Ability(_selectedAbility, _selectedActor);
-            _selectedActor.ReceiveAbility(ability, _selectedTargets);
+
+            foreach (Targetable t in _selectedTargets){
+                ability.CurrentTargets.Add(t);
+            }
+
+            _selectedActor.ReceiveAbility(ability);
             Clear();
 
             if (ability.ChannelTime > 0){

@@ -7,54 +7,23 @@ namespace TTW.Combat{
     public class CheckingTool
     {
         public bool IsAvailable(Combatant c, bool writeReason){
-            string reason = "";
-            bool returnValue = true;
-
-            if (c.GetComponent<Health>().StatusExists(StatusEffect.Down)){
-                reason += "\n" + c.Targetable.Name + " is not available because they are down";
-                returnValue = false;
-            } 
-            if (c.GetComponent<Health>().StatusExists(StatusEffect.Stunned)){
-                reason += "\n" + c.Targetable.Name + " is not available because they are stunned";
-                returnValue = false;
-            } 
-            if (c.GetComponent<Health>().StatusExists(StatusEffect.Asleep)){
-                reason += "\n" + c.Targetable.Name + " is not available because they are asleep";
-                returnValue = false;
-            } 
-            if (c.Tapped){
-                reason += "\n" + c.Targetable.Name + " is not available because they are tapped";
-                returnValue = false;
-            } 
-            if (c.Exhausted){
-                reason += "\n" + c.Targetable.Name + " is not available because they are exhausted";
-                returnValue = false;
-            } 
-            if (c.Channeling){
-                reason += "\n" + c.Targetable.Name + " is not available because they are channeling";
-                returnValue = false;
-            } 
-
-            if (writeReason)
-                CombatWriter.Singleton.Write(reason);
-            
-            return returnValue;
+            return c.Health.PassesActionConditions(writeReason);
         }
 
-        public bool CheckTurnOver(CombatSide turn, List<Combatant> actors, List<Combatant> enemies)
+        public bool CheckTurnOver(CombatSide turn, List<Combatant> combatants)
         {
             switch (turn)
             {
                 default:
                 case CombatSide.Ally:
-                    foreach (var a in actors)
+                    foreach (var a in combatants)
                     {
                         if (IsAvailable(a, false))
                             return false;
                     }
                     return true;
                 case CombatSide.Enemy:
-                    foreach (var a in enemies)
+                    foreach (var a in combatants)
                     {
                         if (IsAvailable(a, false))
                             return false;

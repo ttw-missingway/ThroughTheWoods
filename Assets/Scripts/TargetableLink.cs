@@ -11,7 +11,7 @@ namespace TTW.Combat{
 
         private void Start()
         {
-            _linkLibrary = LinkLibrary.Current;
+            _linkLibrary = CombatManager.Current.LinkLibrary;
             targetable = GetComponent<Targetable>();
             SetLinkClass();
             RegisterLinkInfo();
@@ -20,9 +20,9 @@ namespace TTW.Combat{
 
         private void SetLinkClass()
         {
-            if (targetable.Position.PlayingFieldSide == CombatSide.Ally)
+            if (targetable.Position.CombatSide == CombatSide.Ally)
                 _linkClass = LinkLibrary.LinkClass.Ally;
-            else if (targetable.Position.PlayingFieldSide == CombatSide.Enemy)
+            else if (targetable.Position.CombatSide == CombatSide.Enemy)
                 _linkClass = LinkLibrary.LinkClass.Enemy;
         }
 
