@@ -8,6 +8,7 @@ namespace TTW.Combat
 {
     public class AI : MonoBehaviour
     {
+        //test comment
         CombatManager _combatManager;
         EventBroadcaster _eventBroadcaster;
         [SerializeField] PlayerTurn _currentTurn;
