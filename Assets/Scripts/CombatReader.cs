@@ -50,7 +50,6 @@ namespace TTW.Combat{
             switch (strArray[0])
             {
                 case "end":
-                        _pc.EndTurn();
                         break;
                 case "actors":
                         writer.WriteAvailableCombatants(_combatManager.Allies);
@@ -81,7 +80,7 @@ namespace TTW.Combat{
         {
             bool stopParsing = true;
             CheckingTool cTool = new CheckingTool();
-            var selectableActors = cTool.GetAvailableActors(_combatManager.Allies);
+            var selectableActors = cTool.GetAvailableAllies(_combatManager.Allies);
             var allActors = _combatManager.Allies;
             Combatant actor = allActors.Where(a => a.Actor.Name.ToLower() == strArray[0]).FirstOrDefault();
 
@@ -125,17 +124,17 @@ namespace TTW.Combat{
             print("combatant: " + actor);
             print("ability: " + selectedAbility);
 
-            _pc.SetActor(actor);
-            _pc.SetAbility(selectedAbility);
+            // _pc.SetActor(actor);
+            // _pc.SetAbility(selectedAbility);
 
             if (selectedAbility.TargetingMode == TargetScope.Random || selectedAbility.TargetingMode == TargetScope.Global){
-                _pc.Execute();
+                // _pc.Execute();
                 return false;
             }
 
             if (selectedAbility.TargetTypes.Contains(TargetingClass.Self) && strArray.Length < 3){
                 _pc.SetTargetSelf();
-                _pc.Execute();
+                // _pc.Execute();
                 return false;
             }
 
@@ -154,10 +153,10 @@ namespace TTW.Combat{
 
             print("target: " + selectedTarget);
 
-            _pc.SetActor(actor);
-            _pc.SetAbility(selectedAbility);
-            _pc.SetTarget(selectedTarget);
-            _pc.Execute();
+            // _pc.SetActor(actor);
+            // _pc.SetAbility(selectedAbility);
+            // _pc.SetTarget(selectedTarget);
+            // _pc.Execute();
 
             return stopParsing;
         }

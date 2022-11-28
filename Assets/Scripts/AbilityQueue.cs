@@ -17,18 +17,17 @@ public class AbilityQueue : MonoBehaviour
     }
 
     private void Start(){
-        broadcaster.EndAction += OnEndAction;
+        // broadcaster.EndAction += OnEndAction;
     }
 
-    private void OnEndAction(object sender, EventArgs e)
-    {
-        LaunchAbility();
-    }
+    // private void OnEndAction(object sender, EventArgs e)
+    // {
+    //     LaunchAbility();
+    // }
 
     public int QueueCount => Abilities.Count;
 
     public void AddAbility(Ability ability){
-        broadcaster.ReadyForNewActionChain(false);
         Abilities.Enqueue(ability);
         _abilitiesCount = Abilities.Count;
 
@@ -37,17 +36,18 @@ public class AbilityQueue : MonoBehaviour
     }
 
     public void LaunchAbility(){
-        if (Abilities.Count == 0) 
+        if (Abilities.Count == 0){
+            EndOfAction();
             return;
+        }
 
         var launch = Abilities.Dequeue();
         _abilitiesCount = Abilities.Count;
 
         var fx = Instantiate(launch.AbilityData.abilityFX);
-        if (_abilitiesCount == 0) 
-            broadcaster.ReadyForNewActionChain(true);
-        // fx.EndOfFX += OnFXEnd;
+        fx.EndOfFX += OnFXEnd;
         fx.SetAbility(launch);
+        broadcaster.CallStartAction();
     }
 
     private bool ReadyToLaunch(){
@@ -61,8 +61,12 @@ public class AbilityQueue : MonoBehaviour
         return ready;
     }
 
-    // private void OnFXEnd(object sender, EventArgs e)
-    // {
-    //     LaunchAbility();
-    // }
+    private void OnFXEnd(object sender, EventArgs e)
+    {
+        LaunchAbility();
+    }
+
+    private void EndOfAction(){
+        broadcaster.CallEndOfAction();
+    }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TTW.Systems;
 using UnityEngine;
@@ -30,8 +29,9 @@ namespace TTW.Combat{
 
         TargetingTool _tTool;
         CheckingTool _cTool;
-
         EventBroadcaster _events;
+
+        bool _awake = false;
 
         private void Start()
         {
@@ -39,29 +39,51 @@ namespace TTW.Combat{
             _cTool = new CheckingTool();
             _combatManager = CombatManager.Current;
             _events = _combatManager.GetComponent<EventBroadcaster>();
-            _events.EndAction += StartOfAction;
+            _events.StartOfAlliesTurn += OnStartOfAlliesTurn;
+            _events.EndOfAlliesTurn += OnEndOfAlliesTurn;
+            _events.PromptAction += OnPromptAction;
+            _events.EndTurnPrompt += OnEndTurnPrompt;
         }
 
-        public void StartOfAction(object o, EventArgs e)
+        private void OnEndTurnPrompt(object sender, EventArgs e)
         {
-            if (_combatManager.Turn != CombatSide.Ally) return;
+            PromptEndOfTurn();
+        }
 
+        private void PromptEndOfTurn()
+        {
+            CombatWriter.Singleton.WriteEndTurnPrompt();
+        }
+
+        private void OnEndOfAlliesTurn(object sender, EventArgs e)
+        {
+            _awake = false;
+        }
+
+        private void OnStartOfAlliesTurn(object sender, EventArgs e)
+        {
+            _awake = true;
+        }
+
+        public void OnPromptAction(object o, EventArgs e)
+        {
+            PromptNewAction();
+        }
+
+        private void PromptNewAction()
+        {
             CombatWriter.Singleton.Write("Select An Actor!");
-            _availableActors = _cTool.GetAvailableActors(_combatManager.Allies);
-            
-
-            if (_availableActors.Count == 0){
-                EndTurn();
-                return;
-            }
+            _availableActors = _combatManager.AvailableActors;
 
             CombatWriter.Singleton.WriteAvailableCombatants(_availableActors);
         }
 
         public void ReceiveLink(LinkLibrary.LinkData link){
 
-            if (_combatManager.State != CombatState.Control) return;
-            if (_combatManager.Turn != CombatSide.Ally) return;
+            if (!_awake) return;
+
+            if (link.Keyword == "endturn")
+                _combatManager.EndTurn();
 
             if (_selectedActor == null)
             {
@@ -126,7 +148,7 @@ namespace TTW.Combat{
         {
             if (link.LinkClass == LinkLibrary.LinkClass.Ally)
             {
-                _availableActors = _cTool.GetAvailableActors(_combatManager.Allies);
+                _availableActors = _cTool.GetAvailableAllies(_combatManager.Allies);
 
                 var matchingActor = _availableActors.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
                 if (matchingActor != null)
@@ -146,11 +168,11 @@ namespace TTW.Combat{
             CombatWriter.Singleton.WriteAvailableAbilities(_selectedActor.Abilities);
         }
 
-        public void SetActor(Combatant actor){
+        private void SetActor(Combatant actor){
             _selectedActor = actor;
         }
 
-        public void SetAbility(AbilityData ability){
+        private void SetAbility(AbilityData ability){
             _selectedAbility = ability;
 
             if (ability.TargetingMode == TargetScope.Random)
@@ -159,7 +181,7 @@ namespace TTW.Combat{
                 GlobalTargets(ability);
         }
 
-        public void SetTarget(Targetable target){
+        private void SetTarget(Targetable target){
             _selectedTargets.Add(target);
         }
 
@@ -181,120 +203,7 @@ namespace TTW.Combat{
             _selectedTargets.Add(_selectedActor.Targetable);
         }
 
-        private void Update(){
-            if (Input.GetKeyDown(KeyCode.Return)){
-                EndTurn();
-            }
-        }
-
-        // private void Update(){
-
-        //     if (_combatManager.Turn != CombatTurn.Actor || _combatManager.State != CombatState.Control){
-        //         _currentTurn = PlayerTurn.Waiting;
-        //         return;
-        //     }
-        //     else if (_currentTurn == PlayerTurn.Waiting){
-        //         _currentTurn = PlayerTurn.SelectCombatant;
-        //         _availableActors = cTool.GetAvailableActors(_combatManager.Actors);
-        //         CombatWriter.Singleton.WriteAvailableCombatants(_availableActors);
-        //         if (_availableActors.Count ==0){
-        //             CombatWriter.Singleton.Write("No Available Actors Left, Press Enter To End Turn");
-        //         }
-        //     }
-
-        //     if (Input.GetKeyDown(KeyCode.B)){
-        //         if (_currentTurn == PlayerTurn.SelectAbility){
-        //             _currentTurn = PlayerTurn.SelectCombatant;
-        //             CombatWriter.Singleton.WriteAvailableCombatants(_availableActors);
-        //         }
-        //         else if (_currentTurn == PlayerTurn.SelectTarget){
-        //             _currentTurn = PlayerTurn.SelectAbility;
-        //             CombatWriter.Singleton.WriteAvailableAbilities(_selectedActor.Abilities);
-        //         }
-        //         else if (_currentTurn == PlayerTurn.ReadyToExecute){
-        //             _currentTurn = PlayerTurn.SelectTarget;
-        //             if (_availableTargets != null)
-        //                     CombatWriter.Singleton.WriteAvailableTargets(_availableTargets);
-        //                 else    
-        //                     CombatWriter.Singleton.Write("No available targets");
-        //         }
-        //     }
-
-        //     if (Input.GetKeyDown(KeyCode.Return)){
-        //         CombatWriter.Singleton.Write("Are You Sure You Want To End Your Turn? Y/N");
-        //         _currentTurn = PlayerTurn.ReadyToEnd;
-        //     }
-
-        //     if (_currentTurn == PlayerTurn.ReadyToEnd){
-        //         if (Input.GetKeyDown(KeyCode.Y)){
-        //             CombatWriter.Singleton.Write("Enemy Turn!");
-        //             EndTurn();
-        //         }
-        //         if (Input.GetKeyDown(KeyCode.N)){
-        //             _currentTurn = PlayerTurn.Waiting;
-        //         }
-        //     }
-
-        //     if (_currentTurn == PlayerTurn.SelectCombatant){
-        //         for (var i=0; i<keyCodes.Length; i++){
-        //             if (Input.GetKeyDown(keyCodes[i])){
-        //                 _selectedActor = _availableActors[i];
-        //                 CombatWriter.Singleton.Write("Selected " + _selectedActor);
-        //                 _currentTurn = PlayerTurn.SelectAbility;
-        //                 _availableAbilities = tTool.FilterAbilities(_selectedActor, _selectedActor.Abilities);
-        //                 if (_availableAbilities.Count > 0){
-        //                     CombatWriter.Singleton.WriteAvailableAbilities(_availableAbilities);
-        //                 }
-        //                 else{
-        //                     CombatWriter.Singleton.Write("No Available Abilities");
-        //                 }
-
-        //             }  
-        //         }  
-        //     }
-        //     else if (_currentTurn == PlayerTurn.SelectAbility){
-        //         for (var i=0; i<keyCodes.Length; i++){
-        //             if (Input.GetKeyDown(keyCodes[i])){
-        //                 _selectedAbility = _availableAbilities[i];
-        //                 CombatWriter.Singleton.Write("Selected " + _selectedAbility);
-        //                 _currentTurn = PlayerTurn.SelectTarget;
-        //                 _availableTargets = tTool.FilterTargetables(_selectedActor, _selectedAbility);
-        //                 if (_availableTargets.Count > 0)
-        //                     CombatWriter.Singleton.WriteAvailableTargets(_availableTargets);
-        //                 else    
-        //                     CombatWriter.Singleton.Write("No available targets");
-        //             }
-        //         }
-        //     }
-        //     else if (_currentTurn == PlayerTurn.SelectTarget) {
-        //         for (var i=0; i<keyCodes.Length; i++){
-        //             if (Input.GetKeyDown(keyCodes[i])){
-        //                 _selectedTargets.Add(_availableTargets[i]);
-        //                 CombatWriter.Singleton.Write("Selected " + _availableTargets[i]);
-        //                 _currentTurn = PlayerTurn.ReadyToExecute;
-        //                 CombatWriter.Singleton.Write("Press Space To Perform Ability");
-        //             }
-        //         }
-        //     }
-        //     else if (_currentTurn == PlayerTurn.ReadyToExecute){
-        //         if (Input.GetKeyDown(KeyCode.Space)){
-        //             var ability = new Ability(_selectedAbility, _selectedActor);
-        //             _selectedActor.ReceiveAbility(ability, _selectedTargets);
-        //             Clear();
-
-        //             if (ability.ChannelTime > 0){
-        //                 CombatWriter.Singleton.Write("channeling attack!");
-        //                 _currentTurn = PlayerTurn.Waiting;
-        //             }
-        //             else{
-        //                 CombatWriter.Singleton.Write("performing attack!");
-        //                 _combatManager.ChangeState(CombatState.Animation);
-        //             }
-        //         }
-        //     }
-        // }
-
-        public void Execute(){
+        private void Execute(){
             var tTool = new TargetingTool();
 
             bool commenseExecute = true;
@@ -319,10 +228,10 @@ namespace TTW.Combat{
             if (ability.ChannelTime > 0){
                 CombatWriter.Singleton.Write("channeling attack!");
                 _currentTurn = PlayerTurn.Waiting;
+                _events.CallEndOfAction();
             }
             else{
                 CombatWriter.Singleton.Write("performing attack!");
-                _combatManager.ChangeState(CombatState.Animation);
             }
         }
 
@@ -332,10 +241,6 @@ namespace TTW.Combat{
             _selectedAbility = null;
             _selectedTargets.Clear();
             _availableTargets.Clear();
-        }
-
-        public void EndTurn(){
-            _combatManager.EndTurn();
         }
     }
 }

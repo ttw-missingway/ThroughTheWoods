@@ -6,8 +6,13 @@ using UnityEngine;
 namespace TTW.Combat{
     public class CheckingTool
     {
+        private List<Combatant> _availableActors;
+        private List<Combatant> _availableEnemies;
+        public List<Combatant> AvailableActors => _availableActors;
+        public List<Combatant> AvailableEnemies => _availableEnemies;
+
         public bool IsAvailable(Combatant c, bool writeReason){
-            return c.Health.PassesActionConditions(writeReason);
+            return c.Health.PassesActionConditions(true);
         }
 
         public bool CheckTurnOver(CombatSide turn, List<Combatant> combatants)
@@ -32,12 +37,14 @@ namespace TTW.Combat{
             }
         }
 
-        public List<Combatant> GetAvailableActors(List<Combatant> actors){
+        public List<Combatant> GetAvailableAllies(List<Combatant> actors){
             var availableActors = new List<Combatant>();
             foreach(Combatant a in actors){
                 if (IsAvailable(a, false))
                     availableActors.Add(a);
             }
+
+            _availableActors = availableActors;
 
             return availableActors;
         }
@@ -48,6 +55,8 @@ namespace TTW.Combat{
                 if (IsAvailable(e, false))
                     availableEnemies.Add(e);
             }
+
+            _availableEnemies = availableEnemies;
 
             return availableEnemies;
         }

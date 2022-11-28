@@ -1,37 +1,35 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace TTW.Combat {
     public class EventBroadcaster : MonoBehaviour
     {
         [SerializeField] CombatManager _manager;
-        public event EventHandler EndTurn;
-        public event EventHandler StartTurnAlly;
-        public event EventHandler StartTurnEnemy;
-        public event EventHandler StartTurn;
-        public event EventHandler EndAction;
-        private bool _endOfActionFlag = false;
-        public bool EndOfActionFlag => _endOfActionFlag;
+        public event EventHandler EndOfAlliesTurn;
+        public event EventHandler EndOfEnemiesTurn;
+        public event EventHandler StartOfAlliesTurn;
+        public event EventHandler StartOfEnemiesTurn;
+        public event EventHandler EndOfAction;
+        public event EventHandler StartOfAction;
+        public event EventHandler StartOfEventPhase;
+        public event EventHandler EndOfEventPhase;
+        public event EventHandler EndTurnPrompt;
+        public event EventHandler PromptAction;
 
         private void EndEventPhase()
         {
             print("end of event phase");
-            _manager.ChangeState(CombatState.Control);
-        }
-
-        public void ReadyForNewActionChain(bool inProgress){
-            _endOfActionFlag = inProgress;
+            EndOfEventPhase?.Invoke(this, EventArgs.Empty);
         }
 
         public void StartEventPhase()
         {
             print("Start of Event Phase");
+            StartOfEventPhase?.Invoke(this, EventArgs.Empty);
+
             if (!CheckForEvents())
             {
                 EndEventPhase();
-                CallStartTurn();
             }
             else
             {
@@ -39,52 +37,53 @@ namespace TTW.Combat {
             }
         }
 
-        private void CallStartTurn()
+        public void CallStartOfAlliesTurn()
         {
-            if (_manager.Turn == CombatSide.Ally)
-            {
-                print("start of turn: Ally");
-                StartTurnAlly?.Invoke(this, EventArgs.Empty);
-            }
-            else
-            {
-                print("start of turn: Enemy");
-                StartTurnEnemy?.Invoke(this, EventArgs.Empty);
-            }
+            print("start of turn: Ally");
+            StartOfAlliesTurn?.Invoke(this, EventArgs.Empty);
+        }
 
-            StartTurn?.Invoke(this, EventArgs.Empty);
+        public void CallStartOfEnemiesTurn()
+        {
+            print("start of turn: Enemy");
+            StartOfEnemiesTurn?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void CallEndTurnPrompt(){
+            EndTurnPrompt?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void CallPromptAction(){
+            PromptAction?.Invoke(this, EventArgs.Empty);
         }
 
         private bool CheckForEvents()
         {
-           //check for events, return true if
-
             return false;
         }
 
-        public void EndOfAnimation(){
-            // if (_manager.State == CombatState.Event){
-            //     EndEventPhase();
-            // }
-            if (_manager.State == CombatState.Control){
-                if (_manager.NoCombatantsRemaining()){
-                    print("end of turn");
-                    CallEndTurn();
-                }
-                else if (_endOfActionFlag){
-                    print("end of action");
-                    _manager.ChangeState(CombatState.Control);
-                    CallEndOfAction();
-                }
-            }
+        public void CallStartAction(){
+            print("Start of Action");
+            StartOfAction?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void CallActionPrompt(){
+            PromptAction?.Invoke(this, EventArgs.Empty);
         }
 
         public void CallEndOfAction(){
-            EndAction?.Invoke(this, EventArgs.Empty);
+            print("End of Action");
+            EndOfAction?.Invoke(this, EventArgs.Empty);
         }
 
-        public void CallEndTurn(){
-            EndTurn?.Invoke(this, EventArgs.Empty);
+        public void CallEndOfEnemiesTurn(){
+            print("End Of Enemies Turn");
+            EndOfEnemiesTurn?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void CallEndOfAlliesTurn(){
+            print("End Of Allies Turn");
+            EndOfAlliesTurn?.Invoke(this, EventArgs.Empty);
         }
     }
 }

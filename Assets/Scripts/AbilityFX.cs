@@ -44,7 +44,6 @@ namespace TTW.Combat
         public void End()
         {
             MarkedForDeletion = true;
-            _instance.EventBroadcaster.EndOfAnimation();
             EndOfFX?.Invoke(this, EventArgs.Empty);
             Destroy(gameObject);
         }

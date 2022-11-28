@@ -7,7 +7,6 @@ using System.Linq;
 namespace TTW.Systems{
     public class LinkLibrary : MonoBehaviour
     {
-        [SerializeField]
         private List<LinkData> links = new List<LinkData>();
 
         public void AddLink(string linkId, LinkClass linkClass, ScriptableObject data){
@@ -16,6 +15,8 @@ namespace TTW.Systems{
 
             var linkData = new LinkData(linkId, linkClass, data);
             links.Add(linkData);
+
+            print("added link: " + linkId);
         }
 
         public LinkData Get(string key){
@@ -27,7 +28,8 @@ namespace TTW.Systems{
             Enemy,
             Status,
             Ability,
-            Object
+            Object,
+            Command
         }
 
         public struct LinkData{

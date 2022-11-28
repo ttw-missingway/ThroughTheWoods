@@ -36,6 +36,7 @@ namespace TTW.Combat
         public void ReceiveAbility(Ability ability)
         {
             if (ability.AffectedTargets.Contains(this)) return;
+            if (!tTool.TargetingConditionsCheck(ability.Sender, this, ability.AbilityData, true)) return;
 
             if (!AccuracyCheck(ability)){
                 print("The ability missed!");

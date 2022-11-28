@@ -42,7 +42,14 @@ namespace TTW.Combat
             _targetable = GetComponent<Targetable>();
             _combatant = GetComponent<Combatant>();
             _exhaust = new Exhaust(_position.CombatSide);
+            _exhaust.OnCountdownChange += CountdownChanged;
             _channel = new Channel(_position.CombatSide, _combatant);
+            _channel.OnCountdownChange += CountdownChanged;
+        }
+
+        private void CountdownChanged(object sender, EventArgs e)
+        {
+            UpdateDisplay();
         }
 
         private void Start()
@@ -50,8 +57,10 @@ namespace TTW.Combat
             // _combInst = CombatManager.Current;
             // _combInst.OnTurnEnd += _combInst_OnActionEnd;
             _eventBroadcast = CombatManager.Current.EventBroadcaster;
-            _eventBroadcast.EndTurn += _combInst_OnActionEnd;
-            
+            if (_position.CombatSide == CombatSide.Ally)
+                _eventBroadcast.EndOfAlliesTurn += _combInst_OnTurnEnd;
+            else
+                _eventBroadcast.EndOfEnemiesTurn += _combInst_OnTurnEnd;
             UpdateDisplay();
         }
 
@@ -114,13 +123,13 @@ namespace TTW.Combat
                 returnValue = false;
             } 
 
-            if (writeReason)
+            if (writeReason && reason != "")
                 print(reason);
             
             return returnValue;
         }
 
-        private void _combInst_OnActionEnd(object sender, EventArgs e)
+        private void _combInst_OnTurnEnd(object sender, EventArgs e)
         {
             List<Status> markedForRemoval = new List<Status>();
 
@@ -135,8 +144,9 @@ namespace TTW.Combat
             foreach (var m in markedForRemoval)
             {
                 RemoveStatusEffect(m);
-                UpdateDisplay();
             }
+
+            UpdateDisplay();
         }
 
         internal void Heal()
@@ -170,16 +180,10 @@ namespace TTW.Combat
 
         private void RemoveStatusEffect(Status stat)
         {
-            // var matchingStatus = _uiStatusContainer.GetComponentsInChildren<UIStatus>().Where(s => s.Status == stat).FirstOrDefault();
-
-            // if (matchingStatus != null)
-            //     Destroy(matchingStatus.gameObject);
-
             if (_statusEffects.Contains(stat)){
                 _statusEffects.Remove(stat);
                 
             }
-                
         }
 
         internal void Dispel()
@@ -285,9 +289,15 @@ namespace TTW.Combat
 
         public void Death()
         {
+            BreakChannel();
             ClearAllStatus();
             CreateNewStatus(StatusEffect.Down, 0, canExpire: false);
             UpdateDisplay();
+        }
+
+        private void BreakChannel()
+        {
+            _channel.ChannelBreak();
         }
 
         private void ClearAllStatus()

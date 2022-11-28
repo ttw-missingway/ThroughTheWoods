@@ -17,6 +17,8 @@ public class Exhaust : Countdown
     public int ExhaustTime => _turns;
     public bool Exhausted => _exhausted;
 
+    bool _turnOfCast = false;
+
     //INITIALIZE
     public Exhaust (CombatSide combatSide)
     {
@@ -24,20 +26,26 @@ public class Exhaust : Countdown
         _eventBroadcaster = CombatManager.Current.EventBroadcaster;
         
         if (_combatSide == CombatSide.Ally)
-            _eventBroadcaster.StartTurnAlly += StartTurn;
+            _eventBroadcaster.StartOfAlliesTurn += StartTurn;
         if (_combatSide == CombatSide.Enemy)
-            _eventBroadcaster.StartTurnEnemy += StartTurn;
+            _eventBroadcaster.StartOfEnemiesTurn += StartTurn;
     }
 
     //UPDATE
     private void StartTurn(object sender, EventArgs e)
     {
+        if (_turnOfCast == true){
+            _turnOfCast = false;
+            return;
+        }
+
         SubtractFromCountDown(1);
     }
 
     public void SetExhaust(int time){
         SetCountDown(time);
         _exhausted = true;
+        _turnOfCast = true;
     }
 
     internal override void CountDownEnd()

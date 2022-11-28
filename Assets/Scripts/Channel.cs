@@ -24,14 +24,13 @@ public class Channel : Countdown
         _eventBroadcaster = CombatManager.Current.EventBroadcaster;
         
         if (_combatSide == CombatSide.Ally)
-            _eventBroadcaster.StartTurnAlly += StartTurn;
+            _eventBroadcaster.StartOfAlliesTurn += StartTurn;
         if (_combatSide == CombatSide.Enemy)
-            _eventBroadcaster.StartTurnEnemy += StartTurn;
+            _eventBroadcaster.StartOfEnemiesTurn += StartTurn;
     }
 
     public void StartChannel(int channelTime, Ability channeledAbility)
     {
-        
         if (channelTime == 0) return;
 
         _channeling = true;
@@ -55,5 +54,6 @@ public class Channel : Countdown
     {
         _channeling = false;
         _turns = 0;
+        _channeledAbility = null;
     }
 }

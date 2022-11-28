@@ -32,11 +32,9 @@ namespace TTW.Systems
         [ShowIf(nameof(attackMode))]
         public RangeType RangeType;
 
-        [ShowIf(nameof(showAccuracy))]
         [PropertyRange(0, 100)]
         public float Accuracy;
 
-        [ShowIf(nameof(showAccuracy))]
         public bool NoMiss;
 
         [ShowIf(nameof(showTMode))]

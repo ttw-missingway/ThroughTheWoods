@@ -144,6 +144,7 @@ namespace TTW.Combat{
                     if (isSelf) value = true;
                     break;
                 default:
+                    value = false;
                     break;
             }
 

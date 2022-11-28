@@ -36,6 +36,8 @@ namespace TTW.Combat
         public EventBroadcaster EventBroadcaster => _eventBroadcaster;
         public AbilityQueue AbilityQueue => _abilityQueue;
         public LinkLibrary LinkLibrary => _linkLibrary;
+        public List<Combatant> AvailableActors => _cTool.AvailableActors;
+        public List<Combatant> AvailableEnemies => _cTool.AvailableEnemies;
 
         //Tools
         CheckingTool _cTool;
@@ -46,12 +48,63 @@ namespace TTW.Combat
             _linkLibrary = GetComponent<LinkLibrary>();
             _abilityQueue = GetComponent<AbilityQueue>();
             _eventBroadcaster = GetComponent<EventBroadcaster>();
+            _eventBroadcaster.StartOfAction += OnStartOfAction;
+            _eventBroadcaster.EndOfAction += OnEndOfAction;
+            _eventBroadcaster.EndOfEventPhase += OnEndOfEventPhase;
+            _eventBroadcaster.StartOfEnemiesTurn += OnStartOfTurn;
+            _eventBroadcaster.StartOfAlliesTurn += OnStartOfTurn;
             _cTool = new CheckingTool(); 
         }
 
         private void Start(){
             EstablishPositions();
+            _cTool.GetAvailableAllies(Allies);
+            _cTool.GetAvailableEnemies(Enemies);
             BeginCombat();
+        }
+
+        private void OnStartOfTurn(object sender, EventArgs e)
+        {
+            CheckForTurnOver();
+        }
+
+        private void OnStartOfAction(object sender, EventArgs e)
+        {
+            _combatState = CombatState.Animation;
+        }
+
+        private void OnEndOfEventPhase(object sender, EventArgs e)
+        {
+            if (Turn == CombatSide.Ally) 
+                _eventBroadcaster.CallStartOfAlliesTurn();
+            else
+                _eventBroadcaster.CallStartOfEnemiesTurn();
+        }
+
+        private void OnEndOfAction(object sender, EventArgs e)
+        {
+            CheckForTurnOver();
+        }
+
+        private void CheckForTurnOver()
+        {
+            _combatState = CombatState.Control;
+
+            if (CheckNoCombatantsRemaining()){
+                PromptEndOfTurn();
+            }
+            else{
+                PromptAction();
+            }
+        }
+
+        private void PromptEndOfTurn()
+        {
+            _eventBroadcaster.CallEndTurnPrompt();
+        }
+
+        private void PromptAction(){
+            _eventBroadcaster.CallActionPrompt();
         }
 
         public void BeginCombat(){
@@ -70,7 +123,7 @@ namespace TTW.Combat
             Objects.Add(o);
         }
 
-        public bool NoCombatantsRemaining(){
+        public bool CheckNoCombatantsRemaining(){
             bool results = false;
 
             if (_turn == CombatSide.Ally)
@@ -84,12 +137,14 @@ namespace TTW.Combat
         public void EndTurn(){
             if (_turn == CombatSide.Ally){
                 _turn = CombatSide.Enemy;
+                _eventBroadcaster.CallEndOfAlliesTurn();
             }
             else if (_turn == CombatSide.Enemy){
                 _turn = CombatSide.Ally;
+                _eventBroadcaster.CallEndOfEnemiesTurn();
             }
             ChangeState(CombatState.Event);
-            _eventBroadcaster.CallEndTurn();
+            
             _eventBroadcaster.StartEventPhase();
         }
 

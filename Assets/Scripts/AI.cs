@@ -20,6 +20,8 @@ namespace TTW.Combat
         TargetingTool tTool;
         CheckingTool cTool;
 
+        bool _awake = false;
+
         private void Start()
         {
             _combatManager = CombatManager.Current;
@@ -27,25 +29,34 @@ namespace TTW.Combat
             tTool = new TargetingTool();
             cTool = new CheckingTool();
             _availableEnemies = cTool.GetAvailableEnemies(_combatManager.Enemies);
-            _eventBroadcaster.StartTurn += _OnTurnStart;
-            _eventBroadcaster.EndAction += _OnActionEnd;
+            _eventBroadcaster.StartOfEnemiesTurn += _OnTurnStart;
+            _eventBroadcaster.EndOfEnemiesTurn += _OnEndTurn;
+            _eventBroadcaster.PromptAction += _OnPromptAction;
         }
 
-        private void _OnActionEnd(object sender, EventArgs e)
+        private void _OnEndTurn(object sender, EventArgs e)
         {
-            if (_combatManager.Turn == CombatSide.Enemy && _combatManager.State == CombatState.Control){
+            _awake = false;
+            Clear();
+        }
+
+        private void _OnPromptAction(object sender, EventArgs e)
+        {
+            if (_awake){
                 PerformAction();
             }
         }
 
         private void _OnTurnStart(object sender, EventArgs e)
         {
-            if (_combatManager.Turn == CombatSide.Enemy && _combatManager.State == CombatState.Control){
-                PerformAction();
-            }
+            _awake = true;
+            PerformAction();
         }
 
         public void PerformAction(){
+            if (!_awake)
+                return;
+
             _availableEnemies = cTool.GetAvailableEnemies(_combatManager.Enemies);
             TTWMath math = new TTWMath();
             var _shuffledList = math.Shuffle<Combatant>(_availableEnemies, _availableEnemies.Count);
@@ -71,13 +82,6 @@ namespace TTW.Combat
                 Clear();
                 return;
             }
-
-            EndTurn();
-        }
-
-        private void EndTurn(){
-            Clear();
-            _combatManager.EndTurn();
         }
 
         private void Clear()

@@ -45,7 +45,7 @@ namespace TTW.Combat
             _exhaust = _health.Exhaust;
             _channel = _health.Channel;
             _eventBroadcaster = CombatManager.Current.EventBroadcaster;
-            _eventBroadcaster.EndTurn += _OnTurnEnd;
+            _eventBroadcaster.StartOfEventPhase += _OnTurnEnd;
         }
 
         private void RegisterAbilities(){
@@ -87,10 +87,6 @@ namespace TTW.Combat
         public void SendAbility(Ability ability)
         {
             var desiredTargets = new List<Targetable>(ability.CurrentTargets);
-
-            foreach(Targetable t in desiredTargets){
-                print(t.Name);
-            }
 
             ability.ClearTargets();
             foreach(Targetable t in desiredTargets){
@@ -155,7 +151,7 @@ namespace TTW.Combat
         public void ReceiveAbility(Ability ability)
         {
             if (ability.ExhaustTime > 0){
-                _exhaust.SetCountDown(ability.ExhaustTime);
+                _exhaust.SetExhaust(ability.ExhaustTime);
             }
                 
             if (ability.ChannelTime > 0){

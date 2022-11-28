@@ -16,9 +16,17 @@ namespace TTW.Combat{
         [SerializeField] GameObject _textEngine;
         [SerializeField] CombatManager _combatManager;
 
-        public void Awake(){
+        EventBroadcaster _events;
+        LinkLibrary _library;
+
+        private void Awake(){
             Singleton = this;
             _combatManager = GetComponent<CombatManager>();
+            _library = GetComponent<LinkLibrary>();
+        }
+
+        private void Start(){
+            _library.AddLink("endturn", LinkLibrary.LinkClass.Command, null);
         }
 
         public void Write(string text){
@@ -37,6 +45,13 @@ namespace TTW.Combat{
                 var keyword = actor.Keyword;
                 CombatWriter.Singleton.Write((i + 1) + ": " + "<link=" + keyword + "><b><color=green>" + name + "</color></b></link>");
             }
+        }
+
+        public void WriteEndTurnPrompt(){
+            ClearConsole();
+            CombatWriter.Singleton.Write("No Actors Available");
+            CombatWriter.Singleton.Write("");
+            CombatWriter.Singleton.Write("<link=endturn><b><color=red> click to end turn </color></b></link>");
         }
 
         public void WriteAvailableAbilities(List<AbilityData> abilities)
