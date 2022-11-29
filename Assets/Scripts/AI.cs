@@ -30,9 +30,17 @@ namespace TTW.Combat
             tTool = new TargetingTool();
             cTool = new CheckingTool();
             _availableEnemies = cTool.GetAvailableEnemies(_combatManager.Enemies);
+            _eventBroadcaster.PromptAction += _OnPromptAction;
+            _eventBroadcaster.EndTurnPrompt += _OnEndTurnPrompt;
             _eventBroadcaster.StartOfEnemiesTurn += _OnTurnStart;
             _eventBroadcaster.EndOfEnemiesTurn += _OnEndTurn;
-            _eventBroadcaster.PromptAction += _OnPromptAction;
+        }
+
+        private void _OnEndTurnPrompt(object sender, EventArgs e)
+        {
+            if (!_awake) return;
+
+            _combatManager.EndTurn();
         }
 
         private void _OnEndTurn(object sender, EventArgs e)
@@ -43,20 +51,19 @@ namespace TTW.Combat
 
         private void _OnPromptAction(object sender, EventArgs e)
         {
-            if (_awake){
-                PerformAction();
-            }
+            if (!_awake) return;
+
+            PerformAction();
         }
 
         private void _OnTurnStart(object sender, EventArgs e)
         {
             _awake = true;
-            PerformAction();
+            _combatManager.CheckForTurnOver();
         }
 
         public void PerformAction(){
-            if (!_awake)
-                return;
+            if (!_awake) return;
 
             _availableEnemies = cTool.GetAvailableEnemies(_combatManager.Enemies);
             TTWMath math = new TTWMath();

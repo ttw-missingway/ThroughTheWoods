@@ -51,8 +51,6 @@ namespace TTW.Combat
             _eventBroadcaster.StartOfAction += OnStartOfAction;
             _eventBroadcaster.EndOfAction += OnEndOfAction;
             _eventBroadcaster.EndOfEventPhase += OnEndOfEventPhase;
-            _eventBroadcaster.StartOfEnemiesTurn += OnStartOfTurn;
-            _eventBroadcaster.StartOfAlliesTurn += OnStartOfTurn;
             _cTool = new CheckingTool(); 
         }
 
@@ -61,11 +59,6 @@ namespace TTW.Combat
             _cTool.GetAvailableAllies(Allies);
             _cTool.GetAvailableEnemies(Enemies);
             BeginCombat();
-        }
-
-        private void OnStartOfTurn(object sender, EventArgs e)
-        {
-            CheckForTurnOver();
         }
 
         private void OnStartOfAction(object sender, EventArgs e)
@@ -86,7 +79,7 @@ namespace TTW.Combat
             CheckForTurnOver();
         }
 
-        private void CheckForTurnOver()
+        public void CheckForTurnOver()
         {
             _combatState = CombatState.Control;
 

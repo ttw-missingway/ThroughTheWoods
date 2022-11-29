@@ -12,7 +12,7 @@ namespace TTW.Combat{
         public List<Combatant> AvailableEnemies => _availableEnemies;
 
         public bool IsAvailable(Combatant c, bool writeReason){
-            return c.Health.PassesActionConditions(true);
+            return c.Health.PassesActionConditions(writeReason);
         }
 
         public bool CheckTurnOver(CombatSide turn, List<Combatant> combatants)

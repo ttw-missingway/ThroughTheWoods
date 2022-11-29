@@ -31,7 +31,7 @@ namespace TTW.Combat{
         CheckingTool _cTool;
         EventBroadcaster _events;
 
-        bool _awake = false;
+        bool _awake;
 
         private void Start()
         {
@@ -39,39 +39,47 @@ namespace TTW.Combat{
             _cTool = new CheckingTool();
             _combatManager = CombatManager.Current;
             _events = _combatManager.GetComponent<EventBroadcaster>();
-            _events.StartOfAlliesTurn += OnStartOfAlliesTurn;
-            _events.EndOfAlliesTurn += OnEndOfAlliesTurn;
             _events.PromptAction += OnPromptAction;
             _events.EndTurnPrompt += OnEndTurnPrompt;
+            _events.StartOfAlliesTurn += OnStartOfTurn;
+            _events.EndOfAlliesTurn += OnEndOfTurn;
+        }
+
+        private void OnEndOfTurn(object sender, EventArgs e)
+        {
+            _awake = false;
+        }
+
+        private void OnStartOfTurn(object sender, EventArgs e)
+        {
+            _awake = true;
+            _combatManager.CheckForTurnOver();
         }
 
         private void OnEndTurnPrompt(object sender, EventArgs e)
         {
+            if (!_awake) return;
+
             PromptEndOfTurn();
         }
 
         private void PromptEndOfTurn()
         {
+            print("Prompt Received! End Of Turn");
+
             CombatWriter.Singleton.WriteEndTurnPrompt();
-        }
-
-        private void OnEndOfAlliesTurn(object sender, EventArgs e)
-        {
-            _awake = false;
-        }
-
-        private void OnStartOfAlliesTurn(object sender, EventArgs e)
-        {
-            _awake = true;
         }
 
         public void OnPromptAction(object o, EventArgs e)
         {
+            if (!_awake) return;
+
             PromptNewAction();
         }
 
         private void PromptNewAction()
         {
+            print("Prompt Received! New Action");
             CombatWriter.Singleton.Write("Select An Actor!");
             _availableActors = _combatManager.AvailableActors;
 
@@ -79,7 +87,7 @@ namespace TTW.Combat{
         }
 
         public void ReceiveLink(LinkLibrary.LinkData link){
-
+            // if (_combatManager.Turn != CombatTurn.Ally || !_combatManager.State == CombatState.Control) return;
             if (!_awake) return;
 
             if (link.Keyword == "endturn")

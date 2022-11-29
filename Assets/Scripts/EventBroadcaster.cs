@@ -53,10 +53,6 @@ namespace TTW.Combat {
             EndTurnPrompt?.Invoke(this, EventArgs.Empty);
         }
 
-        public void CallPromptAction(){
-            PromptAction?.Invoke(this, EventArgs.Empty);
-        }
-
         private bool CheckForEvents()
         {
             return false;
@@ -68,6 +64,7 @@ namespace TTW.Combat {
         }
 
         public void CallActionPrompt(){
+            print("Action Prompt");
             PromptAction?.Invoke(this, EventArgs.Empty);
         }
 
