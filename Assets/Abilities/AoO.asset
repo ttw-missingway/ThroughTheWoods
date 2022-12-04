@@ -22,8 +22,8 @@ MonoBehaviour:
   TargetTypes: 01000000
   TargetingMode: 1
   RangeType: 0
-  Accuracy: 0
-  NoMiss: 0
+  Accuracy: 100
+  NoMiss: 1
   Damaging: 1
   ChangeStance: 0
   Stance: 0
@@ -32,18 +32,11 @@ MonoBehaviour:
   MagicType: 0
   StatusEffect: 0
   statusEffectDuration: 0
-  ChangeStatsSelf: 0
-  StatSelf: 0
-  StatSelfDegree: 0
   ChangeStatsTarget: 0
-  StatTarget: 0
-  StatTargetDegree: 0
   Reposition: 0
   Movement: 0
   MovementDegree: 0
   TrySignal: 0
   AttackVariant: 0
   Creation: 0
-  Trap: {fileID: 0}
-  Enemy: {fileID: 0}
   Obstacle: {fileID: 0}

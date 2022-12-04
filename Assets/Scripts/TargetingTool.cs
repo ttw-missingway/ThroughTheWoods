@@ -63,8 +63,7 @@ namespace TTW.Combat{
 
                 return false;
             }
-
-            MonoBehaviour.print(ability.name + " is available!");
+            
             return true;
         }
 

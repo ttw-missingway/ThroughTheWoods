@@ -22,8 +22,8 @@ MonoBehaviour:
   TargetTypes: 00000000
   TargetingMode: 0
   RangeType: 0
-  Accuracy: 0
-  NoMiss: 0
+  Accuracy: 100
+  NoMiss: 1
   Damaging: 1
   ChangeStance: 0
   Stance: 0
