@@ -41,8 +41,12 @@ namespace TTW.Combat
             _psSystem.Play();
         }
 
-        public void SendAbilityData(){
-            foreach(Targetable t in _targets){
+        public void SendAbilityData()
+        {
+            _ability.Sender.OnAbilityCommence(_ability);
+
+            foreach (Targetable t in _targets)
+            {
                 t.ReceiveAbility(_ability);
             }
         }

@@ -138,6 +138,11 @@ namespace TTW.Combat
             }
         }
 
+        public void OnAbilityCommence(Ability ability){
+            if (ability.ExhaustTime > 0)
+                _exhaust.SetExhaust(ability.ExhaustTime);
+        }
+
         public void ExecuteAoO(Targetable target){
             var aooData = CombatManager.Current.AttackOfOpportunity;
             Ability aoo = new Ability(aooData, this);
@@ -150,9 +155,9 @@ namespace TTW.Combat
         //Can this be moved elsewhere?
         public void ReceiveAbility(Ability ability)
         {
-            if (ability.ExhaustTime > 0){
-                _exhaust.SetExhaust(ability.ExhaustTime);
-            }
+            // if (ability.ExhaustTime > 0){
+            //     _exhaust.SetExhaust(ability.ExhaustTime);
+            // }
                 
             if (ability.ChannelTime > 0){
                 _channel.StartChannel(ability.ChannelTime, ability);

@@ -43,6 +43,8 @@ public class Exhaust : Countdown
     }
 
     public void SetExhaust(int time){
+        if (time == 0) return;
+        
         SetCountDown(time);
         _exhausted = true;
         _turnOfCast = true;
@@ -50,6 +52,7 @@ public class Exhaust : Countdown
 
     internal override void CountDownEnd()
     {
+        MonoBehaviour.print("NO LONGER EXHAUSTED!");
         _exhausted = false;
     }
 }
