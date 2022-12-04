@@ -64,7 +64,7 @@ namespace TTW.Combat{
                 return false;
             }
 
-            CombatWriter.Singleton.Write(ability.name + " is available!");
+            MonoBehaviour.print(ability.name + " is available!");
             return true;
         }
 

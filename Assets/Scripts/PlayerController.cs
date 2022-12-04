@@ -81,9 +81,8 @@ namespace TTW.Combat{
         {
             print("Prompt Received! New Action");
             CombatWriter.Singleton.Write("Select An Actor!");
-            _availableActors = _combatManager.AvailableActors;
 
-            CombatWriter.Singleton.WriteAvailableCombatants(_availableActors);
+            CombatWriter.Singleton.WriteAvailableCombatants(_combatManager.GetAvailableAllies());
         }
 
         public void ReceiveLink(LinkLibrary.LinkData link){
@@ -126,7 +125,6 @@ namespace TTW.Combat{
                 }
 
                 CombatWriter.Singleton.ClearConsole();
-                CombatWriter.Singleton.Write("Performing " + _selectedAbility.Name);
                 Execute();
             }
         }
@@ -237,9 +235,6 @@ namespace TTW.Combat{
                 CombatWriter.Singleton.Write("channeling attack!");
                 _currentTurn = PlayerTurn.Waiting;
                 _events.CallEndOfAction();
-            }
-            else{
-                CombatWriter.Singleton.Write("performing attack!");
             }
         }
 

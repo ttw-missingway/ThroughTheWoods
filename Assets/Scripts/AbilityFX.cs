@@ -25,9 +25,15 @@ namespace TTW.Combat
         public void SetAbility(Ability ability){
             _ability = ability;
             _targets = ability.CurrentTargets;
-            if (ability.AoO)
+            CombatWriter.Singleton.ClearConsole();
+
+            if (ability.AoO){
                 print("An Attack of Opportunity!");
+                CombatWriter.Singleton.Write("An Attack of Opportunity!");
+            }
+                
             print(_ability.Sender.Targetable.Name + " is performing " + _ability.AbilityData.Name + " on " + _targets[0].Name);
+            CombatWriter.Singleton.Write("Performing " + _ability.AbilityData.Name);
         }
 
         public void Particles()

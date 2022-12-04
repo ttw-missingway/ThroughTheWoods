@@ -36,8 +36,14 @@ namespace TTW.Combat
         public EventBroadcaster EventBroadcaster => _eventBroadcaster;
         public AbilityQueue AbilityQueue => _abilityQueue;
         public LinkLibrary LinkLibrary => _linkLibrary;
-        public List<Combatant> AvailableActors => _cTool.AvailableActors;
-        public List<Combatant> AvailableEnemies => _cTool.AvailableEnemies;
+
+        public List<Combatant> GetAvailableAllies(){
+            return _cTool.GetAvailableAllies(Allies);
+        }
+
+        public List<Combatant> AvailableEnemies(){
+            return _cTool.AvailableEnemies;
+        }
 
         //Tools
         CheckingTool _cTool;
