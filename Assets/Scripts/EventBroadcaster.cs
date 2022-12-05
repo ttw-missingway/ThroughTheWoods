@@ -16,6 +16,8 @@ namespace TTW.Combat {
         public event EventHandler EndTurnPrompt;
         public event EventHandler PromptAction;
 
+        private bool _actionStarted = false;
+
         private void EndEventPhase()
         {
             print("1.End of event phase");
@@ -59,8 +61,14 @@ namespace TTW.Combat {
         }
 
         public void CallStartAction(){
-            print("     2A.Start of Action");
-            StartOfAction?.Invoke(this, EventArgs.Empty);
+            if (!_actionStarted){
+                print("     2A.Start of Action");
+                _actionStarted = true;
+                StartOfAction?.Invoke(this, EventArgs.Empty);
+            }
+            else{
+                print("     2A.Start of Sequenced-Action");
+            }
         }
 
         public void CallActionPrompt(){
@@ -69,7 +77,8 @@ namespace TTW.Combat {
 
         public void CallEndOfAction(){
             print("     2A.End of Action");
-            EndOfAction?.Invoke(this, EventArgs.Empty);
+            _actionStarted = false;
+            EndOfAction?.Invoke(this, EventArgs.Empty);   
         }
 
         public void CallEndOfEnemiesTurn(){
