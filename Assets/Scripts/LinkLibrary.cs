@@ -15,8 +15,6 @@ namespace TTW.Systems{
 
             var linkData = new LinkData(linkId, linkClass, data);
             links.Add(linkData);
-
-            print("added link: " + linkId);
         }
 
         public LinkData Get(string key){

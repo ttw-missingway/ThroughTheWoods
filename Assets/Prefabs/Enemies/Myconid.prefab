@@ -446,7 +446,6 @@ MonoBehaviour:
   _actor: {fileID: 11400000, guid: 2877f0e840090834f8dc409e3bc62bfb, type: 2}
   Abilities:
   - {fileID: 11400000, guid: cd52f54eb0aeb2f428832375a7a31430, type: 2}
-  Tapped: 0
   _channelTargets: []
   _attackIcon: {fileID: 6811870294774120735}
 --- !u!114 &7788058784544317437
@@ -482,7 +481,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _statusEffects: []
-  _currentStance: 0
+  _currentStance: 2
   _exhaust:
     _turns: 0
     _exhausted: 0
@@ -490,7 +489,6 @@ MonoBehaviour:
   _channel:
     _turns: 0
     _channeling: 0
-    _combatSide: 0
   _tapped: 0
   _statusPrefab: {fileID: 0}
   _display: {fileID: 7485324352674328715}

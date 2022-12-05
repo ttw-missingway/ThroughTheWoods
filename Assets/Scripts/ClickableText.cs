@@ -25,7 +25,6 @@ namespace TTW.Systems{
                     
                     var linkInfo = text.textInfo.linkInfo[linkIndex];
                     var linkId = linkInfo.GetLinkID();
-                    print(linkId);
                     var itemData = library.Get(linkId);
 
                     pc.ReceiveLink(itemData);

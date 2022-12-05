@@ -65,8 +65,6 @@ namespace TTW.Combat{
 
         private void PromptEndOfTurn()
         {
-            print("Prompt Received! End Of Turn");
-
             CombatWriter.Singleton.WriteEndTurnPrompt();
         }
 
@@ -79,7 +77,6 @@ namespace TTW.Combat{
 
         private void PromptNewAction()
         {
-            print("Prompt Received! New Action");
             CombatWriter.Singleton.Write("Select An Actor!");
 
             CombatWriter.Singleton.WriteAvailableCombatants(_combatManager.GetAvailableAllies());

@@ -38,8 +38,10 @@ namespace TTW.Combat
             if (ability.AffectedTargets.Contains(this)) return;
             if (!tTool.TargetingConditionsCheck(ability.Sender, this, ability.AbilityData, true)) return;
 
+            print("         2b. " + Name + " has received ability " + ability.AbilityData.Name);
+
             if (!AccuracyCheck(ability)){
-                print("The ability missed!");
+                // print("7. The ability missed!");
                 return;
             }
 
@@ -57,11 +59,11 @@ namespace TTW.Combat
 
             if (ability.Damaging){
                 if (Health.Stance == Stance.Guarding && ability.MagicType == MagicType.None){
-                    print("ability blocked by guarding!");
+                    // print("7. ability blocked by guarding!");
                 }
                 else{
                     Health.TakeDamage();
-                    print(Name + " took damage!");
+                    // print("7. " + Name + " took damage!");
                 }
                 Health.BreakStance();
             }   

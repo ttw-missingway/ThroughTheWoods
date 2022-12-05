@@ -18,13 +18,13 @@ namespace TTW.Combat {
 
         private void EndEventPhase()
         {
-            print("end of event phase");
+            print("1.End of event phase");
             EndOfEventPhase?.Invoke(this, EventArgs.Empty);
         }
 
         public void StartEventPhase()
         {
-            print("Start of Event Phase");
+            print("1.Start of Event Phase");
             StartOfEventPhase?.Invoke(this, EventArgs.Empty);
 
             if (!CheckForEvents())
@@ -39,13 +39,13 @@ namespace TTW.Combat {
 
         public void CallStartOfAlliesTurn()
         {
-            print("start of turn: Ally");
+            print("2.Start of turn: Ally");
             StartOfAlliesTurn?.Invoke(this, EventArgs.Empty);
         }
 
         public void CallStartOfEnemiesTurn()
         {
-            print("start of turn: Enemy");
+            print("2.Start of turn: Enemy");
             StartOfEnemiesTurn?.Invoke(this, EventArgs.Empty);
         }
 
@@ -59,27 +59,26 @@ namespace TTW.Combat {
         }
 
         public void CallStartAction(){
-            print("Start of Action");
+            print("     2A.Start of Action");
             StartOfAction?.Invoke(this, EventArgs.Empty);
         }
 
         public void CallActionPrompt(){
-            print("Action Prompt");
             PromptAction?.Invoke(this, EventArgs.Empty);
         }
 
         public void CallEndOfAction(){
-            print("End of Action");
+            print("     2A.End of Action");
             EndOfAction?.Invoke(this, EventArgs.Empty);
         }
 
         public void CallEndOfEnemiesTurn(){
-            print("End Of Enemies Turn");
+            print("2.End Of Enemies Turn");
             EndOfEnemiesTurn?.Invoke(this, EventArgs.Empty);
         }
 
         public void CallEndOfAlliesTurn(){
-            print("End Of Allies Turn");
+            print("2.End Of Allies Turn");
             EndOfAlliesTurn?.Invoke(this, EventArgs.Empty);
         }
     }
