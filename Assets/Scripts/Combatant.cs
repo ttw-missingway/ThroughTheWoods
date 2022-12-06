@@ -28,6 +28,8 @@ namespace TTW.Combat
         Exhaust _exhaust;
         Channel _channel;
         TargetingTool _tTool;
+        AoO _aoo;
+        public AoO AoO => _aoo;
 
         private void Awake()
         {
@@ -37,6 +39,7 @@ namespace TTW.Combat
             _abilityQueue = CombatManager.Current.GetComponent<AbilityQueue>();
             _linkLibrary = CombatManager.Current.LinkLibrary;
             _tTool = new TargetingTool();
+            _aoo = new AoO();
             RegisterAbilities();
         }
 
@@ -67,23 +70,6 @@ namespace TTW.Combat
             Health.Tap(false);
         }
 
-        // public void PerformChanneledAbility()
-        // {
-        //     print(this + " is performing channeled ability " + _channeledAbility.AbilityData.name);
-        //     var tTool = new TargetingTool();
-
-        //     foreach (Targetable t in _channelTargets){
-        //         if (!tTool.TargetingConditionsCheck(this, t, _channeledAbility.AbilityData, true)){
-        //             _channelTargets.Remove(t);
-        //         }
-        //     }
-
-        //     SendAbility(_channelTargets, _channeledAbility);
-        //     _channeling = false;
-        //     _channeledAbility = null;
-        //     _channelTargets.Clear();
-        // }
-
         public void SendAbility(Ability ability)
         {
             var desiredTargets = new List<Targetable>(ability.CurrentTargets);
@@ -106,59 +92,14 @@ namespace TTW.Combat
             SendAbility(counter);
         }
 
-        public void AooRequest(AoORequest request){
-            if (request.AlreadyRequested(Targetable)) return;
-
-            ProximityTool pTool = new ProximityTool(request.Requestee.Position);
-
-            if (!pTool.IsChained(Position)) return;
-
-            request.AddRequested(Targetable);
-            
-            float random;
-            float baseChance = 10f;
-
-            if (GetComponent<Health>().Stance == Stance.Alert){
-                random = -1f;
-            }
-            else{
-                random = UnityEngine.Random.Range(0f, 100f);
-            }
-
-            if (random < baseChance){
-                ExecuteAoO(request.Target);
-            }
-
-            foreach (Position p in Position.Neighbors){
-                if (p == null) continue;
-
-                if (p.GetComponent<Combatant>() != null){
-                    p.GetComponent<Combatant>().AooRequest(request);
-                }
-            }
-        }
-
         public void OnAbilityCommence(Ability ability){
             if (ability.ExhaustTime > 0)
                 _exhaust.SetExhaust(ability.ExhaustTime);
         }
 
-        public void ExecuteAoO(Targetable target){
-            var aooData = CombatManager.Current.AttackOfOpportunity;
-            Ability aoo = new Ability(aooData, this);
-            aoo.AttackOfOpportunity();
-            aoo.CurrentTargets.Add(target);
-
-            SendAbility(aoo);
-        }
-
         //Can this be moved elsewhere?
         public void ReceiveAbility(Ability ability)
         {
-            // if (ability.ExhaustTime > 0){
-            //     _exhaust.SetExhaust(ability.ExhaustTime);
-            // }
-                
             if (ability.ChannelTime > 0){
                 _channel.StartChannel(ability.ChannelTime, ability);
                 return;
@@ -172,18 +113,6 @@ namespace TTW.Combat
 
             SendAbility(ability);
         }
-
-        // private void SetChannel(Ability ability, List<Targetable> targets)
-        // {
-        //     _channel = ability.ChannelTime;
-        //     _channeledAbility = ability;
-        //     foreach (Targetable t in targets)
-        //     {
-        //         _channelTargets.Add(t);
-        //     }
-        //     _channeling = true;
-        //     _eventBroadcaster.Channeler.AddToChannelOrder(this);
-        // }
 
         private void ChangeStance(Ability ability)
         {

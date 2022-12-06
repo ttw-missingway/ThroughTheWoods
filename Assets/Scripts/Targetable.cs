@@ -38,17 +38,17 @@ namespace TTW.Combat
             if (ability.AffectedTargets.Contains(this)) return;
             if (!tTool.TargetingConditionsCheck(ability.Sender, this, ability.AbilityData, true)) return;
 
-            print("         2b. " + Name + " has received ability " + ability.AbilityData.Name);
+            CombatManager.Current.EventBroadcaster.PrintDescriptor("         2b. " + Name + " has received ability " + ability.AbilityData.Name);
 
             if (!AccuracyCheck(ability)){
                 // print("7. The ability missed!");
                 return;
             }
 
-            if (Position.Distance == CombatDistance.Front 
-            && !ability.AoO 
-            && ability.TargetTypes.Contains(TargetingClass.Foe))
+            if (CheckAOOConditions(ability))
                 RequestAttackOfOpportunity(ability.Sender.Targetable);
+
+            //Broadcast AOO Trigger;
 
             if (Health.Stance == Stance.Countering)
                 CounterAttack(ability.Sender);
@@ -110,15 +110,30 @@ namespace TTW.Combat
             Health.ChangeStance(stance);
         }
 
+        private bool CheckAOOConditions(Ability ability){
+            bool value = true;
+            CombatDistance attackerPosition = ability.Sender.Position.Distance;
+
+            if (!Health.PassesChainConditions(initialTarget: true))         value = false;
+            if (attackerPosition == CombatDistance.Back)                    value = false;
+            if (ability.AoO)                                                value = false;
+            if (!ability.TargetTypes.Contains(TargetingClass.Foe))          value = false;
+
+            return value;
+        }
+
         private void RequestAttackOfOpportunity(Targetable target)
         {
             var aooRequest = new AoORequest(this, target);
+            
+            if (Health.Stance == Stance.Alert)
+                aooRequest.SetAlert();
 
             foreach (Position p in Position.Neighbors){
                 if (p == null) continue;
 
-                if (p.GetComponent<Combatant>() != null){
-                    p.GetComponent<Combatant>().AooRequest(aooRequest);
+                if (p.GetComponent<Combatant>() != null && p.GetComponent<Targetable>() != null){
+                    p.GetComponent<Combatant>().AoO.ReceiveAoORequest(aooRequest, p.GetComponent<Targetable>());
                 }
             }
         }

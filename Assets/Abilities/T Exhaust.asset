@@ -17,14 +17,14 @@ MonoBehaviour:
   Description: 
   abilityFX: {fileID: 3595960919037275921, guid: 12d9de4e790cce342920521d8b5dd546, type: 3}
   ChannelTime: 0
-  ExhaustTime: 1
+  ExhaustTime: 3
   AbilityType: 0
   TargetTypes: 00000000
   TargetingMode: 0
   RangeType: 0
   Accuracy: 100
   NoMiss: 1
-  Damaging: 1
+  Damaging: 0
   ChangeStance: 0
   Stance: 0
   AidType: 0

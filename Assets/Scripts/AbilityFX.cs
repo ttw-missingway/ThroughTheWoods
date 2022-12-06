@@ -41,7 +41,7 @@ namespace TTW.Combat
 
         public void SendAbilityData()
         {
-            print("         2b." + _ability.Sender.Targetable.Name + " is performing " + _ability.AbilityData.Name + " on " + _targets[0].Name);
+            _instance.EventBroadcaster.PrintDescriptor("         2b." + _ability.Sender.Targetable.Name + " is performing " + _ability.AbilityData.Name + " on " + _targets[0].Name);
 
             _ability.Sender.OnAbilityCommence(_ability);
 

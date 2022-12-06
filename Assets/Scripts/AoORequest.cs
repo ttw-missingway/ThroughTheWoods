@@ -5,12 +5,19 @@ public class AoORequest
 {
     Targetable _requestee;
     Targetable _target;
+    bool _alert = false;
+    public bool Alert => _alert;
+    
     List<Targetable> _alliesRequested = new List<Targetable>();
 
     public AoORequest(Targetable requestee, Targetable target){
         _requestee = requestee;
         _target = target;
         _alliesRequested.Add(requestee);
+    }
+
+    public void SetAlert(){
+        _alert = true;
     }
 
     public void AddRequested(Targetable requested){

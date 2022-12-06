@@ -16,26 +16,26 @@ public class ProximityTool
     }
 
     private void BuildProximityChain(Position posA){
-        if (!ChainConditions(posA)) return;
+        if (!ChainConditions(posA, initialPosition: true)) return;
 
         List<Position> AllPositions = MonoBehaviour.FindObjectsOfType<Position>()
                                         .Where(p => p.CombatSide == posA.CombatSide)
                                         .OrderBy(p => p.OrderNo)
                                         .ToList();
 
-        var index = posA.OrderNo;
+        var index = posA.OrderNo - 1;
 
-        for (var i = index; i < AllPositions.Count; i++){
+        for (var i = index+1; i < AllPositions.Count; i++){
             
-            if (!ChainConditions(AllPositions[i])){
+            if (!ChainConditions(AllPositions[i], initialPosition: false)){
                 break;
             }
 
             FoundLinks.Add(AllPositions[i]);
         }
 
-        for (var i = index-1; i > 0; i--){
-            if (!ChainConditions(AllPositions[i])){
+        for (var i = index-1; i > -1; i--){
+            if (!ChainConditions(AllPositions[i], initialPosition: false)){
                 break;
             }
 
@@ -49,7 +49,8 @@ public class ProximityTool
         return false;
     }
 
-    private bool ChainConditions(Position p){
-        return p.Health.PassesChainConditions();
+    private bool ChainConditions(Position p, bool initialPosition){
+        MonoBehaviour.print("Chain Conditions Evaluated For: " + p.GetComponent<Targetable>().Name);
+        return p.Health.PassesChainConditions(initialPosition);
     }
 }

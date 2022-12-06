@@ -68,7 +68,7 @@ namespace TTW.Combat
             _tapped = tap;
         }
 
-        public bool PassesChainConditions(){
+        public bool PassesChainConditions(bool initialTarget){
             if (_targetable.TargetType == TargetType.Obstacle){
                 return false;
             } 
@@ -84,10 +84,10 @@ namespace TTW.Combat
             if (StatusExists(StatusEffect.Down)){
                 return false;
             }
-            if (Exhausted){
+            if (Exhausted && !initialTarget){
                 return false;
             }  
-            if (Channeling){
+            if (Channeling && !initialTarget){
                 return false;
             }  
 

@@ -17,16 +17,25 @@ namespace TTW.Combat {
         public event EventHandler PromptAction;
 
         private bool _actionStarted = false;
+        [SerializeField]
+        private bool _displayTurnDescriptors = false;
 
         private void EndEventPhase()
         {
-            print("1.End of event phase");
+
+            PrintDescriptor("1.End of event phase");
             EndOfEventPhase?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void PrintDescriptor(string text){
+            if (!_displayTurnDescriptors) return;
+
+            print(text);
         }
 
         public void StartEventPhase()
         {
-            print("1.Start of Event Phase");
+            PrintDescriptor("1.Start of Event Phase");
             StartOfEventPhase?.Invoke(this, EventArgs.Empty);
 
             if (!CheckForEvents())
@@ -41,13 +50,13 @@ namespace TTW.Combat {
 
         public void CallStartOfAlliesTurn()
         {
-            print("2.Start of turn: Ally");
+            PrintDescriptor("2.Start of turn: Ally");
             StartOfAlliesTurn?.Invoke(this, EventArgs.Empty);
         }
 
         public void CallStartOfEnemiesTurn()
         {
-            print("2.Start of turn: Enemy");
+            PrintDescriptor("2.Start of turn: Enemy");
             StartOfEnemiesTurn?.Invoke(this, EventArgs.Empty);
         }
 
@@ -62,12 +71,12 @@ namespace TTW.Combat {
 
         public void CallStartAction(){
             if (!_actionStarted){
-                print("     2A.Start of Action");
+                PrintDescriptor("     2A.Start of Action");
                 _actionStarted = true;
                 StartOfAction?.Invoke(this, EventArgs.Empty);
             }
             else{
-                print("     2A.Start of Sequenced-Action");
+                PrintDescriptor("     2A.Start of Sequenced-Action");
             }
         }
 
@@ -76,18 +85,18 @@ namespace TTW.Combat {
         }
 
         public void CallEndOfAction(){
-            print("     2A.End of Action");
+            PrintDescriptor("     2A.End of Action");
             _actionStarted = false;
             EndOfAction?.Invoke(this, EventArgs.Empty);   
         }
 
         public void CallEndOfEnemiesTurn(){
-            print("2.End Of Enemies Turn");
+            PrintDescriptor("2.End Of Enemies Turn");
             EndOfEnemiesTurn?.Invoke(this, EventArgs.Empty);
         }
 
         public void CallEndOfAlliesTurn(){
-            print("2.End Of Allies Turn");
+            PrintDescriptor("2.End Of Allies Turn");
             EndOfAlliesTurn?.Invoke(this, EventArgs.Empty);
         }
     }
