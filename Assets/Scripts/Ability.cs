@@ -53,7 +53,6 @@ namespace TTW.Combat
             StatusEffectDuration = data.statusEffectDuration;
             Reposition = data.Reposition;
             Movement = data.Movement;
-            MovementDegree = data.MovementDegree;
             AttackVariant = data.AttackVariant;
             Creation = data.Creation;
             Obstacle = data.Obstacle;

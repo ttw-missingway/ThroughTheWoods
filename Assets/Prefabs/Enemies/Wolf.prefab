@@ -1261,6 +1261,7 @@ GameObject:
   - component: {fileID: -7685239894905445324}
   - component: {fileID: -4438034222494597792}
   - component: {fileID: -4933329733970018045}
+  - component: {fileID: 1347531770940527164}
   m_Layer: 0
   m_Name: Wolf
   m_TagString: Untagged
@@ -1413,3 +1414,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data: {fileID: 11400000, guid: c485ee9ea1bc9db4b86b222513f16bc3, type: 2}
+--- !u!114 &1347531770940527164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8996059089013678871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3627a348229f2457a9b7073d92152c95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -11,6 +11,7 @@ namespace TTW.Combat
         //test comment
         CombatManager _combatManager;
         EventBroadcaster _eventBroadcaster;
+        BoardManager _board;
         [SerializeField] PlayerTurn _currentTurn;
         [SerializeField] Combatant _selectedEnemy;
         [SerializeField] AbilityData _selectedAbility;
@@ -27,9 +28,10 @@ namespace TTW.Combat
         {
             _combatManager = CombatManager.Current;
             _eventBroadcaster = _combatManager.EventBroadcaster;
+            _board = _combatManager.Board;
             tTool = new TargetingTool();
             cTool = new CheckingTool();
-            _availableEnemies = cTool.GetAvailableEnemies(_combatManager.Enemies);
+            _availableEnemies = cTool.GetAvailableEnemies(_board.Enemies);
             _eventBroadcaster.PromptAction += _OnPromptAction;
             _eventBroadcaster.EndTurnPrompt += _OnEndTurnPrompt;
             _eventBroadcaster.StartOfEnemiesTurn += _OnTurnStart;
@@ -65,7 +67,7 @@ namespace TTW.Combat
         public void PerformAction(){
             if (!_awake) return;
 
-            _availableEnemies = cTool.GetAvailableEnemies(_combatManager.Enemies);
+            _availableEnemies = cTool.GetAvailableEnemies(_board.Enemies);
             TTWMath math = new TTWMath();
             var _shuffledList = math.Shuffle<Combatant>(_availableEnemies, _availableEnemies.Count);
 
@@ -86,7 +88,7 @@ namespace TTW.Combat
                     ability.CurrentTargets.Add(t);
                 }
 
-                a.ReceiveAbility(ability);
+                a.ActionProcessor.ReceiveAbility(ability);
                 Clear();
                 return;
             }

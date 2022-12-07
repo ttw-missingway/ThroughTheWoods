@@ -30,6 +30,7 @@ namespace TTW.Combat{
         TargetingTool _tTool;
         CheckingTool _cTool;
         EventBroadcaster _events;
+        BoardManager _board;
 
         bool _awake;
 
@@ -38,6 +39,7 @@ namespace TTW.Combat{
             _tTool = new TargetingTool();
             _cTool = new CheckingTool();
             _combatManager = CombatManager.Current;
+            _board = _combatManager.Board;
             _events = _combatManager.GetComponent<EventBroadcaster>();
             _events.PromptAction += OnPromptAction;
             _events.EndTurnPrompt += OnEndTurnPrompt;
@@ -79,7 +81,7 @@ namespace TTW.Combat{
         {
             CombatWriter.Singleton.Write("Select An Actor!");
 
-            CombatWriter.Singleton.WriteAvailableCombatants(_combatManager.GetAvailableAllies());
+            CombatWriter.Singleton.WriteAvailableCombatants(_board.GetAvailableAllies());
         }
 
         public void ReceiveLink(LinkLibrary.LinkData link){
@@ -151,7 +153,7 @@ namespace TTW.Combat{
         {
             if (link.LinkClass == LinkLibrary.LinkClass.Ally)
             {
-                _availableActors = _cTool.GetAvailableAllies(_combatManager.Allies);
+                _availableActors = _cTool.GetAvailableAllies(_board.Allies);
 
                 var matchingActor = _availableActors.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
                 if (matchingActor != null)
@@ -160,7 +162,7 @@ namespace TTW.Combat{
                     WriteAbilities();
                 }
                 else{
-                    var failedActor = _combatManager.Allies.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
+                    var failedActor = _board.Allies.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
                     _cTool.IsAvailable(failedActor, writeReason: true);
                 }
             }
@@ -225,7 +227,7 @@ namespace TTW.Combat{
                 ability.CurrentTargets.Add(t);
             }
 
-            _selectedActor.ReceiveAbility(ability);
+            _selectedActor.ActionProcessor.ReceiveAbility(ability);
             Clear();
 
             if (ability.ChannelTime > 0){

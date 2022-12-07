@@ -105,11 +105,6 @@ namespace TTW.Combat
                 GetComponent<Combatant>().CounterAttack(target);
         }
 
-        private void ChangeStance(Stance stance)
-        {
-            Health.ChangeStance(stance);
-        }
-
         private bool CheckAOOConditions(Ability ability){
             bool value = true;
             CombatDistance attackerPosition = ability.Sender.Position.Distance;
@@ -130,10 +125,12 @@ namespace TTW.Combat
                 aooRequest.SetAlert();
 
             foreach (Position p in Position.Neighbors){
+                Targetable requestee = p.GetComponent<Targetable>();
+                Combatant combatant = p.GetComponent<Combatant>();
                 if (p == null) continue;
 
-                if (p.GetComponent<Combatant>() != null && p.GetComponent<Targetable>() != null){
-                    p.GetComponent<Combatant>().AoO.ReceiveAoORequest(aooRequest, p.GetComponent<Targetable>());
+                if (combatant != null && requestee != null){
+                    combatant.AoO.ReceiveAoORequest(aooRequest, requestee);
                 }
             }
         }

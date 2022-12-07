@@ -66,10 +66,6 @@ namespace TTW.Systems
         [ShowIf(nameof(Reposition))]
         public Movement Movement;
 
-        [ShowIf(nameof(Reposition))]
-        [PropertyRange(0, 10)]
-        public int MovementDegree;
-
         [ShowIf(nameof(showTMode))]
         public bool TrySignal;
 

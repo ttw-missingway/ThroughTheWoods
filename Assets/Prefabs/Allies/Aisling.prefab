@@ -100,6 +100,7 @@ GameObject:
   - component: {fileID: 9062938404935645665}
   - component: {fileID: 7205512722932586696}
   - component: {fileID: 5469490174704806472}
+  - component: {fileID: -4501963919990042832}
   m_Layer: 0
   m_Name: Aisling
   m_TagString: Untagged
@@ -196,7 +197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _statusEffects: []
-  _currentStance: 2
+  _currentStance: 0
   _exhaust:
     _turns: 0
     _exhausted: 0
@@ -248,6 +249,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data: {fileID: 11400000, guid: 03db413695706ba43ac927ad718cf3fd, type: 2}
+--- !u!114 &-4501963919990042832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4445244483600565748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3627a348229f2457a9b7073d92152c95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4786960843210085491
 GameObject:
   m_ObjectHideFlags: 0

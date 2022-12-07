@@ -24,7 +24,7 @@ MonoBehaviour:
   RangeType: 0
   Accuracy: 100
   NoMiss: 1
-  Damaging: 1
+  Damaging: 0
   ChangeStance: 0
   Stance: 0
   AidType: 0

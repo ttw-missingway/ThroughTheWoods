@@ -59,6 +59,24 @@ namespace TTW.Combat
                 _rightNeighbor.GetComponent<Targetable>().ReceiveAbility(ability);
         }
 
+        public void Advance(){
+            _distance = CombatDistance.Front;
+            _health.UpdateDisplay();
+        }
+
+        public void Retreat(){
+            _distance = CombatDistance.Back;
+            _health.UpdateDisplay();
+        }
+
+        public void Swap(Position targetPosition){
+            
+        }
+
+        public void Reposition(Position targetPosition){
+            
+        }
+
 
         // Dictionary<Position, float> _distances = new Dictionary<Position, float>();
 

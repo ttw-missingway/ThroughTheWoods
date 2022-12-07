@@ -24,9 +24,12 @@ namespace TTW.Combat
         LinkLibrary.LinkClass _linkClass = LinkLibrary.LinkClass.Ability;
         EventBroadcaster _eventBroadcaster;
         Health _health;
+        ActionProcessor _actionProcessor;
+        public ActionProcessor ActionProcessor => _actionProcessor;
         public Health Health => _health;
         Exhaust _exhaust;
         Channel _channel;
+        public Channel Channel => _channel;
         TargetingTool _tTool;
         AoO _aoo;
         public AoO AoO => _aoo;
@@ -36,6 +39,7 @@ namespace TTW.Combat
             _position = GetComponent<Position>();
             _health = GetComponent<Health>();
             _targetable = GetComponent<Targetable>();
+            _actionProcessor = GetComponent<ActionProcessor>();
             _abilityQueue = CombatManager.Current.GetComponent<AbilityQueue>();
             _linkLibrary = CombatManager.Current.LinkLibrary;
             _tTool = new TargetingTool();
@@ -95,42 +99,6 @@ namespace TTW.Combat
         public void OnAbilityCommence(Ability ability){
             if (ability.ExhaustTime > 0)
                 _exhaust.SetExhaust(ability.ExhaustTime);
-        }
-
-        //Can this be moved elsewhere?
-        public void ReceiveAbility(Ability ability)
-        {
-            if (ability.ChannelTime > 0){
-                _channel.StartChannel(ability.ChannelTime, ability);
-                return;
-            }
-
-            ChangeStance(ability);
-
-            // if (ability.Reposition){
-            //     Reposition(targets[0], ability);
-            // }
-
-            SendAbility(ability);
-        }
-
-        private void ChangeStance(Ability ability)
-        {
-            var health = GetComponent<Health>();
-
-            if (ability.Stance == Stance.Wait)
-            {
-                if (ability.Stance == Stance.None)
-                    health.ChangeStance(Stance.Alert);
-            }
-            else
-            {
-                health.BreakStance();
-                if (ability.ChangeStance)
-                {
-                    health.ChangeStance(ability.Stance);
-                }
-            }
         }
 
         // private void Reposition(Targetable target, Ability ability)
