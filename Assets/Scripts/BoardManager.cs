@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TTW.Systems;
 using UnityEngine;
 
 namespace TTW.Combat{
@@ -12,6 +13,7 @@ namespace TTW.Combat{
         public List<Position> AllySidePositions = new();
         public List<Position> EnemySidePositions = new();
         CheckingTool _cTool;
+        TTWMath _math;
             
         public List<Combatant> GetAvailableAllies(){
             return _cTool.GetAvailableAllies(Allies);
@@ -23,6 +25,7 @@ namespace TTW.Combat{
 
         private void Start(){
             _cTool = new CheckingTool(); 
+            _math = new TTWMath();
             _cTool.GetAvailableAllies(Allies);
             _cTool.GetAvailableEnemies(Enemies);
         } 
@@ -74,13 +77,24 @@ namespace TTW.Combat{
             return results;
         }
 
-        public void SwitchPositions(List<Position> list, int posA, int posB){
-            (list[posB], list[posA]) = (list[posA], list[posB]);
-            list[posA].SetPositionOrder(list, posA);
-            list[posB].SetPositionOrder(list, posB);
+
+
+        public void SwapPositions(CombatSide side, int posA, int posB){
+            if (side == CombatSide.Ally){
+                _math.SwitchPositions(AllySidePositions, posA, posB);
+                AllySidePositions[posA].SetPositionOrder(AllySidePositions, posA);
+                AllySidePositions[posB].SetPositionOrder(AllySidePositions, posB);
+                (AllySidePositions[posA].transform.position, AllySidePositions[posB].transform.position) = (AllySidePositions[posB].transform.position, AllySidePositions[posA].transform.position);
+            }       
+            else if (side == CombatSide.Enemy){
+                _math.SwitchPositions(EnemySidePositions, posA, posB);
+                EnemySidePositions[posA].SetPositionOrder(EnemySidePositions, posA);
+                EnemySidePositions[posB].SetPositionOrder(EnemySidePositions, posB);
+                (EnemySidePositions[posA].transform.position, EnemySidePositions[posB].transform.position) = (EnemySidePositions[posB].transform.position, EnemySidePositions[posA].transform.position);
+            } 
         }
 
-        public void ReorderPositions(List<Position> list, int oldIndex, int newIndex){
+        private void ReorderPositions(List<Position> list, int oldIndex, int newIndex){
             Position item = list[oldIndex];
             list.RemoveAt(oldIndex);
             list.Insert(newIndex, item);

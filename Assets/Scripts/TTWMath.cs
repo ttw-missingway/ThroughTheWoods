@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 
 namespace TTW.Systems
 {
@@ -20,6 +16,24 @@ namespace TTW.Systems
                     Take(size);
 
             return shuffledList.ToList();
+        }
+
+        public IList<T> SwitchPositions<T>(IList<T> list, int posA, int posB){
+            (list[posB], list[posA]) = (list[posA], list[posB]);
+
+            return list;
+        }
+
+        public IList<T> ReorderPositions<T>(IList<T> list, int oldIndex, int newIndex){
+            T item = list[oldIndex];
+            list.RemoveAt(oldIndex);
+            list.Insert(newIndex, item);
+
+            // for (var i = 0; i < list.Count(); i++){
+            //     list[i].SetPositionOrder(list, i+1);
+            // }
+
+            return list;
         }
     }
 }

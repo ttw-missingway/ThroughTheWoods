@@ -9,7 +9,7 @@ namespace TTW.Combat{
             if (request.AlreadyRequested(requested)) return;
 
             var position = requested.Position;
-            ProximityTool pTool = new ProximityTool(request.Requestee.Position);
+            ProximityTool pTool = new(request.Requestee.Position);
 
             if (!pTool.IsChained(requested.Position)) return;
 
@@ -33,7 +33,7 @@ namespace TTW.Combat{
         }
         private void ExecuteAoO(Targetable target, Combatant combatant){
             var aooData = CombatManager.Current.AttackOfOpportunity;
-            Ability aoo = new Ability(aooData, combatant);
+            Ability aoo = new(aooData, combatant);
             aoo.AttackOfOpportunity();
             aoo.CurrentTargets.Add(target);
 

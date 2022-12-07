@@ -100,14 +100,5 @@ namespace TTW.Combat
             if (ability.ExhaustTime > 0)
                 _exhaust.SetExhaust(ability.ExhaustTime);
         }
-
-        // private void Reposition(Targetable target, Ability ability)
-        // {
-        //     if (ability.Movement == Movement.Advance)
-        //         Position.Advance(target.Position, ability.MovementDegree);
-
-        //     if (ability.Movement == Movement.Retreat)
-        //         Position.Retreat(target.Position, ability.MovementDegree);
-        // }
     }
 }
