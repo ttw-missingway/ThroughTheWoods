@@ -352,6 +352,7 @@ GameObject:
   - component: {fileID: -5052494563450500467}
   - component: {fileID: 7743256461645102767}
   - component: {fileID: -4677137787721844976}
+  - component: {fileID: -2203853080327542977}
   m_Layer: 0
   m_Name: Moth
   m_TagString: Untagged
@@ -416,7 +417,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _actor: {fileID: 11400000, guid: 2877f0e840090834f8dc409e3bc62bfb, type: 2}
   Abilities:
-  - {fileID: 11400000, guid: cd52f54eb0aeb2f428832375a7a31430, type: 2}
+  - {fileID: 11400000, guid: d7209b44ce8552740b15985e6d3344ac, type: 2}
   _channelTargets: []
   _attackIcon: {fileID: 7034956708702401580}
 --- !u!114 &7368047461907588384
@@ -431,7 +432,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f28e875cb73c74391e60a0c5c6b9fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _distance: 0
+  _distance: 1
   _orderNo: 0
   _combatSide: 1
   _leftNeighbor: {fileID: 0}
@@ -504,6 +505,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data: {fileID: 11400000, guid: 0f1bbe05e554ea242bc938751af3a23b, type: 2}
+--- !u!114 &-2203853080327542977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4483114939079975953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3627a348229f2457a9b7073d92152c95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5336876873047469063
 GameObject:
   m_ObjectHideFlags: 0

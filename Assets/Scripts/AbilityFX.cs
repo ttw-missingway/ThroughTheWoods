@@ -16,6 +16,8 @@ namespace TTW.Combat
         public event EventHandler EndOfFX;
         public bool MarkedForDeletion = false;
 
+        bool _abilitySet = false;
+
         private void Start()
         {
             _instance = CombatManager.Current;
@@ -23,6 +25,7 @@ namespace TTW.Combat
         }
             
         public void SetAbility(Ability ability){
+            _abilitySet = true;
             _ability = ability;
             _targets = ability.CurrentTargets;
             CombatWriter.Singleton.ClearConsole();
@@ -41,6 +44,11 @@ namespace TTW.Combat
 
         public void SendAbilityData()
         {
+            if (!_abilitySet){
+                print("ERROR: ABILITY NOT SET FOR FX");
+                return;
+            }
+
             _instance.EventBroadcaster.PrintDescriptor("         2b." + _ability.Sender.Targetable.Name + " is performing " + _ability.AbilityData.Name + " on " + _targets[0].Name);
 
             _ability.Sender.OnAbilityCommence(_ability);
@@ -49,6 +57,26 @@ namespace TTW.Combat
             {
                 t.ReceiveAbility(_ability);
             }
+        }
+
+        public void OpenAbilityIcons(){
+            if (!_abilitySet){
+                print("ERROR: ABILITY NOT SET FOR FX");
+                return;
+            }
+
+            _targets[0].OpenTargetIcon();
+            _ability.Sender.OpenAttackIcon();
+        }
+
+        public void CloseAbilityIcons(){
+            if (!_abilitySet){
+                print("ERROR: ABILITY NOT SET FOR FX");
+                return;
+            }
+
+            _targets[0].CloseTargetIcon();
+            _ability.Sender.CloseAttackIcon();
         }
 
         public void End()

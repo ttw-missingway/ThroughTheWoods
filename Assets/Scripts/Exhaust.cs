@@ -52,7 +52,6 @@ public class Exhaust : Countdown
 
     internal override void CountDownEnd()
     {
-        MonoBehaviour.print("NO LONGER EXHAUSTED!");
         _exhausted = false;
     }
 }

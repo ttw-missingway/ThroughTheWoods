@@ -50,7 +50,6 @@ public class ProximityTool
     }
 
     private bool ChainConditions(Position p, bool initialPosition){
-        MonoBehaviour.print("Chain Conditions Evaluated For: " + p.GetComponent<Targetable>().Name);
         return p.Health.PassesChainConditions(initialPosition);
     }
 }

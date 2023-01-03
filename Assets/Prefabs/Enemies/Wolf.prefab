@@ -1326,7 +1326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _actor: {fileID: 11400000, guid: 2877f0e840090834f8dc409e3bc62bfb, type: 2}
   Abilities:
-  - {fileID: 11400000, guid: cd52f54eb0aeb2f428832375a7a31430, type: 2}
+  - {fileID: 11400000, guid: d7209b44ce8552740b15985e6d3344ac, type: 2}
   _channelTargets: []
   _attackIcon: {fileID: 2249254256911059829}
 --- !u!114 &2643548650629112358

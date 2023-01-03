@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5056f39d68c010b40a4bd5a525232ddf, type: 3}
   m_Name: T Retreat
   m_EditorClassIdentifier: 
-  Name: T Advance
-  Keyword: adv
+  Name: T Retreat
+  Keyword: ret
   Description: 
   abilityFX: {fileID: 3595960919037275921, guid: 12d9de4e790cce342920521d8b5dd546, type: 3}
   ChannelTime: 0
@@ -34,8 +34,7 @@ MonoBehaviour:
   statusEffectDuration: 0
   ChangeStatsTarget: 0
   Reposition: 1
-  Movement: 1
-  MovementDegree: 0
+  Movement: 2
   TrySignal: 0
   AttackVariant: 0
   Creation: 0

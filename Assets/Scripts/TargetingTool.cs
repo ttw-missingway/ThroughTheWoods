@@ -56,7 +56,7 @@ namespace TTW.Combat{
             }
 
 
-            if (!RangeCheck(ability, target))
+            if (!RangeCheck(ability, target, sender))
             {
                 if (writeReason)
                     CombatWriter.Singleton.Write(target.Name + " is too far away!");
@@ -69,9 +69,11 @@ namespace TTW.Combat{
 
         private bool TargetMatchCheck(Combatant sender, Targetable target, AbilityData ability)
         {
+
             var abilityTypes = ability.TargetTypes;
 
             bool match = true;
+
             if (abilityTypes.Contains(TargetingClass.Down) || abilityTypes.Contains(TargetingClass.Self))
             {
                 foreach (TargetingClass t in abilityTypes)
@@ -99,12 +101,21 @@ namespace TTW.Combat{
             return match;
         }
 
-        private bool RangeCheck(AbilityData ability, Targetable target)
+        private bool RangeCheck(AbilityData ability, Targetable target, Combatant sender)
         {
+            var casterDistance = sender.Position.Distance;
             var distance = target.Position.Distance;
             var success = true;
 
+            if (sender.Targetable == target){
+                return success;
+            }
+
             if (ability.RangeType == RangeType.Melee && distance == CombatDistance.Back){
+                success = false;
+            }
+
+            if (ability.RangeType == RangeType.Melee && casterDistance == CombatDistance.Back){
                 success = false;
             }
 

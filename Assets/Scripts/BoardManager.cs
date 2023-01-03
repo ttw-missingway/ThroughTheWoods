@@ -23,9 +23,12 @@ namespace TTW.Combat{
             return _cTool.AvailableEnemies;
         }
 
-        private void Start(){
+        private void Awake(){
             _cTool = new CheckingTool(); 
             _math = new TTWMath();
+        }
+
+        private void Start(){
             _cTool.GetAvailableAllies(Allies);
             _cTool.GetAvailableEnemies(Enemies);
         } 
@@ -53,7 +56,6 @@ namespace TTW.Combat{
             }
         }
 
-
         public void AddActor(Combatant actor){
             Allies.Add(actor);
         }
@@ -76,8 +78,6 @@ namespace TTW.Combat{
 
             return results;
         }
-
-
 
         public void SwapPositions(CombatSide side, int posA, int posB){
             if (side == CombatSide.Ally){

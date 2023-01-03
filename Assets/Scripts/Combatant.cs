@@ -10,7 +10,7 @@ namespace TTW.Combat
         [SerializeField] ActorData _actor;
         [SerializeField] public List<AbilityData> Abilities = new List<AbilityData>();
         [SerializeField] Ability _channeledAbility;
-        [SerializeField] List<Targetable> _channelTargets = new List<Targetable>();
+        [SerializeField] List<Targetable> _channelTargets = new();
         [SerializeField] GameObject _attackIcon;
 
         public ActorData Actor => _actor;
@@ -18,7 +18,7 @@ namespace TTW.Combat
         Targetable _targetable;
         public Position Position => _position;
         public Targetable Targetable => _targetable;
-        public event EventHandler onExhaustUpdate;
+        public event EventHandler OnExhaustUpdate;
         AbilityQueue _abilityQueue;
         LinkLibrary _linkLibrary;
         LinkLibrary.LinkClass _linkClass = LinkLibrary.LinkClass.Ability;
@@ -52,7 +52,7 @@ namespace TTW.Combat
             _exhaust = _health.Exhaust;
             _channel = _health.Channel;
             _eventBroadcaster = CombatManager.Current.EventBroadcaster;
-            _eventBroadcaster.StartOfEventPhase += _OnTurnEnd;
+            _eventBroadcaster.StartOfEventPhase += OnTurnEnd;
         }
 
         private void RegisterAbilities(){
@@ -69,7 +69,7 @@ namespace TTW.Combat
             _attackIcon.SetActive(false);
         }
 
-        private void _OnTurnEnd(object sender, EventArgs e)
+        private void OnTurnEnd(object sender, EventArgs e)
         {
             Health.Tap(false);
         }
@@ -91,7 +91,7 @@ namespace TTW.Combat
 
         internal void CounterAttack(Targetable target)
         {
-            Ability counter = new Ability(CombatManager.Current.CounterAttack, this);
+            Ability counter = new(CombatManager.Current.CounterAttack, this);
             counter.CurrentTargets.Add(target);
             SendAbility(counter);
         }

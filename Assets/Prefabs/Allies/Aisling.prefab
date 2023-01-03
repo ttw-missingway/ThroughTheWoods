@@ -162,6 +162,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e5390a11786cac34f9fe3f998e5ab12b, type: 2}
   - {fileID: 11400000, guid: 188f075565801e445ac1f871b020f4e8, type: 2}
   - {fileID: 11400000, guid: 5fd26c616c8634e94b5843fcd92dcc9f, type: 2}
+  - {fileID: 11400000, guid: 41644961836c54fe9ab6d0aa7cb36e98, type: 2}
+  - {fileID: 11400000, guid: cf91b9413684a4e94929d07bde62b136, type: 2}
   _channelTargets: []
   _attackIcon: {fileID: 5552107942826837214}
 --- !u!114 &7333838384443770053

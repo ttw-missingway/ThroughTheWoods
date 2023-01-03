@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TTW.Systems;
 using UnityEngine;
@@ -32,6 +33,8 @@ namespace TTW.Combat{
         EventBroadcaster _events;
         BoardManager _board;
 
+        private Action promptAction;
+
         bool _awake;
 
         private void Start()
@@ -45,6 +48,47 @@ namespace TTW.Combat{
             _events.EndTurnPrompt += OnEndTurnPrompt;
             _events.StartOfAlliesTurn += OnStartOfTurn;
             _events.EndOfAlliesTurn += OnEndOfTurn;
+        }
+
+        private void Update()
+        {
+            if(Input.GetMouseButtonDown(1))
+            {
+                if (!_awake) return;
+
+                if (_selectedTargets.Count() != 0)
+                {
+                    ClearTargets();
+                    PromptNewTarget();
+                    return;
+                }
+                else if (_selectedAbility != null)
+                {
+                    ClearAbility();
+                    PromptAbilities();
+                    return;
+                }
+                else if (_selectedActor != null)
+                {
+                    ClearActor();
+                    PromptNewAction();
+                }
+            }
+        }
+
+        private void ClearTargets()
+        {
+            _selectedTargets.Clear();
+        }
+
+        private void ClearAbility()
+        {
+            _selectedAbility = null;
+        }
+
+        private void ClearActor()
+        {
+            _selectedActor = null;
         }
 
         private void OnEndOfTurn(object sender, EventArgs e)
@@ -113,19 +157,44 @@ namespace TTW.Combat{
             {
                 var availableTargets = _tTool.FilterTargetables(_selectedActor, _selectedAbility, false);
                 var matchingTarget = availableTargets.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
+
                 if (matchingTarget != null)
                 {
                     _selectedTargets.Add(matchingTarget);
                 }
-                else{
+                else
+                {
                     var failedTarget = _tTool.AllTargetables.Where(t => t.Keyword == link.Keyword).FirstOrDefault();
                     _tTool.TargetingConditionsCheck(_selectedActor, failedTarget, _selectedAbility, writeReason: true);
+                    promptAction = ResetAbility;
+                    StartCoroutine(WaitToClear());
                     return;
                 }
 
                 CombatWriter.Singleton.ClearConsole();
                 Execute();
             }
+        }
+
+        private void ResetAbility(){
+            ClearAbility();
+            PromptAbilities();
+        }
+
+        private void ResetActor(){
+            ClearActor();
+            PromptNewAction();
+        }
+
+        IEnumerator WaitToClear()
+        {
+            _awake = false;
+
+            //yield on a new YieldInstruction that waits for 5 seconds.
+            yield return new WaitForSeconds(1);
+
+            _awake = true;
+            promptAction();
         }
 
         private void SelectNewAbility(LinkLibrary.LinkData link)
@@ -137,16 +206,22 @@ namespace TTW.Combat{
                 {
                     _selectedAbility = matchingAbilities.FirstOrDefault();
 
-                    if (_selectedAbility.TargetTypes.Count == 1 && _selectedAbility.TargetTypes[0] == TargetingClass.Self){
+                    if (_selectedAbility.TargetTypes.Count == 1 && _selectedAbility.TargetTypes[0] == TargetingClass.Self)
+                    {
                         SetTargetSelf();
                         Execute();
                         return;
                     }
 
                     CombatWriter.Singleton.ClearConsole();
-                    CombatWriter.Singleton.Write("Select Target");
+                    PromptNewTarget();
                 }
             }
+        }
+
+        private static void PromptNewTarget()
+        {
+            CombatWriter.Singleton.Write("Select Target");
         }
 
         private void SelectNewActor(LinkLibrary.LinkData link)
@@ -159,16 +234,18 @@ namespace TTW.Combat{
                 if (matchingActor != null)
                 {
                     _selectedActor = matchingActor;
-                    WriteAbilities();
+                    PromptAbilities();
                 }
                 else{
                     var failedActor = _board.Allies.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
                     _cTool.IsAvailable(failedActor, writeReason: true);
+                    promptAction = ResetActor;
+                    StartCoroutine(WaitToClear());
                 }
             }
         }
 
-        private void WriteAbilities()
+        private void PromptAbilities()
         {
             CombatWriter.Singleton.WriteAvailableAbilities(_selectedActor.Abilities);
         }

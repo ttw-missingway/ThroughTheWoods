@@ -397,7 +397,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 292.55536, y: -75.62924}
+  m_AnchoredPosition: {x: 292.55536, y: -56.696884}
   m_SizeDelta: {x: 585.2941, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &155110881
@@ -1379,8 +1379,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1373867514}
   m_HandleRect: {fileID: 1373867513}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0
+  m_Value: 0.49999157
+  m_Size: 0.98432094
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1541,12 +1541,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1244600774}
-  - component: {fileID: 1244600773}
   - component: {fileID: 1244600772}
   - component: {fileID: 1244600776}
   - component: {fileID: 1244600775}
   - component: {fileID: 1244600778}
   - component: {fileID: 1244600779}
+  - component: {fileID: 1244600780}
   m_Layer: 0
   m_Name: Combat Manager
   m_TagString: Untagged
@@ -1568,20 +1568,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _textEngine: {fileID: 1951701321}
   _combatManager: {fileID: 0}
---- !u!114 &1244600773
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1244600771}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16b0c2e44a30558429b7c1ff542b9dc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _inputField: {fileID: 653048564}
-  _pc: {fileID: 148099348}
 --- !u!4 &1244600774
 Transform:
   m_ObjectHideFlags: 0
@@ -1610,6 +1596,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1244600776}
+  _displayTurnDescriptors: 0
 --- !u!114 &1244600776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1628,12 +1615,6 @@ MonoBehaviour:
   _combatWriter: {fileID: 0}
   AttackOfOpportunity: {fileID: 11400000, guid: ae01db4a34a9dd24aa82bbb65b601dd7, type: 2}
   CounterAttack: {fileID: 11400000, guid: 9abcdaa986bdb3c4ea8450477e9a9dd2, type: 2}
-  Allies: []
-  Enemies: []
-  Objects: []
-  Targetables: []
-  AllySidePositions: []
-  EnemySidePositions: []
 --- !u!114 &1244600778
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1659,6 +1640,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc31315c8208df04d905f911fd48037d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1244600780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1244600771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 821dd9bfcf40f42f5bc9daad1dbceaa0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Allies: []
+  Enemies: []
+  Traps: []
+  AllySidePositions: []
+  EnemySidePositions: []
 --- !u!1 &1373867512
 GameObject:
   m_ObjectHideFlags: 0

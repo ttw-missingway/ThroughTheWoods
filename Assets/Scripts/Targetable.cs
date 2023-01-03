@@ -125,12 +125,11 @@ namespace TTW.Combat
                 aooRequest.SetAlert();
 
             foreach (Position p in Position.Neighbors){
-                Targetable requestee = p.GetComponent<Targetable>();
-                Combatant combatant = p.GetComponent<Combatant>();
+
                 if (p == null) continue;
 
-                if (combatant != null && requestee != null){
-                    combatant.AoO.ReceiveAoORequest(aooRequest, requestee);
+                if (p.GetComponent<Combatant>() != null && p.GetComponent<Targetable>() != null){
+                    p.GetComponent<Combatant>().AoO.ReceiveAoORequest(aooRequest, p.GetComponent<Targetable>());
                 }
             }
         }
