@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a9bd815c85984da093be3cf7146a179, type: 3}
+  m_Name: Blind
+  m_EditorClassIdentifier: 
+  Name: Blind
+  Keyword: blind
+  Archetype: 0
+  StatusEffect: 6
+  Description: 
+  Duration: 0
+  Damaging: 0
+  BaseLikelihood: 1
+  SpeedFactor: 1
+  SizeFactor: 1
+  StrengthFactor: 0
+  MagicFactor: 0
+  IntellectFactor: 1
+  SightFactor: 1
+  HearingFactor: 1
+  SmellFactor: 1
+  MagicResFactor: 0
+  MentalResFactor: 0
+  PhysResFactor: 0
+  TrapResFactor: 0
+  WeatherResFactor: 0
+  GroundResFactor: 0
+  WaterResFactor: 0
+  AirResFactor: 0
+  LampResFactor: 0
+  SunResFactor: 0
+  MoonResFactor: 0
+  ElecResFactor: 0

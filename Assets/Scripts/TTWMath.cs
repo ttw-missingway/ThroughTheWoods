@@ -1,39 +1,45 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace TTW.Systems
 {
     public class TTWMath
     {
-        public IEnumerable<T> Shuffle<T>(IEnumerable<T> list, int size)
+        public float CalculateLikelihood(ActorStats actorStats, ActionData actionData, EnemyData enemyData)
         {
-            var r = new System.Random();
-            var shuffledList = 
-                list.
-                    Select(x => new { Number = r.Next(), Item = x }).
-                    OrderBy(x => x.Number).
-                    Select(x => x.Item).
-                    Take(size);
+            float baseValue = actionData.BaseLikelihood;
+            ArchetypeEntity archetype = actorStats.AllArchetypes.Where(a => a.Archetype == actionData.Archetype).FirstOrDefault();
 
-            return shuffledList.ToList();
+            if (actionData.AirResFactor) baseValue *= enemyData.ResistanceToAirEffects;
+            if (actionData.ElecResFactor) baseValue *= enemyData.ResistanceToElectricLight;
+            if (actionData.GroundResFactor) baseValue *= enemyData.ResistanceToGroundEffects;
+            if (actionData.HearingFactor) baseValue *= enemyData.Hearing;
+            if (actionData.IntellectFactor) baseValue *= enemyData.Intellect;
+            if (actionData.LampResFactor) baseValue *= enemyData.ResistanceToLampLight;
+            if (actionData.MagicFactor) baseValue *= enemyData.Magic;
+            if (actionData.MagicResFactor) baseValue *= enemyData.MagicResistance;
+            if (actionData.MoonResFactor) baseValue *= enemyData.ResistanceToMoonLight;
+            if (actionData.PhysResFactor) baseValue *= enemyData.PhysicalResistance;
+            if (actionData.SightFactor) baseValue *= enemyData.Sight;
+            if (actionData.SizeFactor) baseValue *= enemyData.Size;
+            if (actionData.SmellFactor) baseValue *= enemyData.Smell;
+            if (actionData.SpeedFactor) baseValue *= enemyData.Speed;
+            if (actionData.StrengthFactor) baseValue *= enemyData.Strength;
+            if (actionData.SunResFactor) baseValue *= enemyData.ResistanceToSunLight;
+            if (actionData.TrapResFactor) baseValue *= enemyData.ResistanceToTraps;
+            if (actionData.WaterResFactor) baseValue *= enemyData.ResistanceToWaterEffects;
+            if (actionData.WeatherResFactor) baseValue *= enemyData.ResistanceToWeather;
+
+
+            baseValue *= ConvertArchetypeLevelToMultiplier(archetype.Level);
+
+            return baseValue;
         }
 
-        public IList<T> SwitchPositions<T>(IList<T> list, int posA, int posB){
-            (list[posB], list[posA]) = (list[posA], list[posB]);
-
-            return list;
-        }
-
-        public IList<T> ReorderPositions<T>(IList<T> list, int oldIndex, int newIndex){
-            T item = list[oldIndex];
-            list.RemoveAt(oldIndex);
-            list.Insert(newIndex, item);
-
-            // for (var i = 0; i < list.Count(); i++){
-            //     list[i].SetPositionOrder(list, i+1);
-            // }
-
-            return list;
+        public float ConvertArchetypeLevelToMultiplier(int level){
+            return (level - 1) * 0.1f + 0.5f; 
         }
     }
 }

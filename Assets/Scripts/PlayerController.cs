@@ -1,325 +1,77 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using TTW.Systems;
 using UnityEngine;
-using System.Linq;
 
-namespace TTW.Combat{
-
-    public enum PlayerTurn{
-        SelectCombatant,
-        SelectAbility,
-        SelectSubAbility,
-        SelectTarget,
-        ReadyToExecute,
-        ReadyToEnd,
-        Waiting
-    }
-
+namespace TTW.Systems
+{
     public class PlayerController : MonoBehaviour
     {
-        [SerializeField] CombatManager _combatManager;
-        [SerializeField] PlayerTurn _currentTurn;
-        [SerializeField] Combatant _selectedActor;
-        [SerializeField] AbilityData _selectedAbility;
-        [SerializeField] List<AbilityData> _availableAbilities;
-        [SerializeField] List<Combatant> _availableActors;
-        [SerializeField] List<Targetable> _availableTargets;
-        [SerializeField] List<Targetable> _selectedTargets = new List<Targetable>();
+        public List<ActorEntity> Actors = new(); 
+        public ActorEntity SelectedActor;
+        public ActionData SelectedAction;
+        public Health SelectedTarget;
+        public Health Gevaudan;
+        bool _commandPhase = false;
+        public event EventHandler EndOfPlayerTurn;
 
-        TargetingTool _tTool;
-        CheckingTool _cTool;
-        EventBroadcaster _events;
-        BoardManager _board;
-
-        private Action promptAction;
-
-        bool _awake;
-
-        private void Start()
-        {
-            _tTool = new TargetingTool();
-            _cTool = new CheckingTool();
-            _combatManager = CombatManager.Current;
-            _board = _combatManager.Board;
-            _events = _combatManager.GetComponent<EventBroadcaster>();
-            _events.PromptAction += OnPromptAction;
-            _events.EndTurnPrompt += OnEndTurnPrompt;
-            _events.StartOfAlliesTurn += OnStartOfTurn;
-            _events.EndOfAlliesTurn += OnEndOfTurn;
+        public void ToggleCommandPhase(){
+            _commandPhase = !_commandPhase;
         }
 
-        private void Update()
-        {
-            if(Input.GetMouseButtonDown(1))
-            {
-                if (!_awake) return;
+        public void AddActorEntity(ActorEntity actor){
+            Actors.Add(actor);
+        }
 
-                if (_selectedTargets.Count() != 0)
-                {
-                    ClearTargets();
-                    PromptNewTarget();
-                    return;
+        private void Update(){
+            if (!_commandPhase) return;
+
+            if (SelectedActor == null){
+                if (Input.GetKeyDown(KeyCode.Q)){
+                SelectedActor = Actors[0];
                 }
-                else if (_selectedAbility != null)
-                {
-                    ClearAbility();
-                    PromptAbilities();
-                    return;
+                if (Input.GetKeyDown(KeyCode.W)){
+                    SelectedActor = Actors[1];
                 }
-                else if (_selectedActor != null)
-                {
-                    ClearActor();
-                    PromptNewAction();
+                if (Input.GetKeyDown(KeyCode.E)){
+                    SelectedActor = Actors[2];
                 }
-            }
-        }
 
-        private void ClearTargets()
-        {
-            _selectedTargets.Clear();
-        }
-
-        private void ClearAbility()
-        {
-            _selectedAbility = null;
-        }
-
-        private void ClearActor()
-        {
-            _selectedActor = null;
-        }
-
-        private void OnEndOfTurn(object sender, EventArgs e)
-        {
-            _awake = false;
-        }
-
-        private void OnStartOfTurn(object sender, EventArgs e)
-        {
-            _awake = true;
-            _combatManager.CheckForTurnOver();
-        }
-
-        private void OnEndTurnPrompt(object sender, EventArgs e)
-        {
-            if (!_awake) return;
-
-            PromptEndOfTurn();
-        }
-
-        private void PromptEndOfTurn()
-        {
-            CombatWriter.Singleton.WriteEndTurnPrompt();
-        }
-
-        public void OnPromptAction(object o, EventArgs e)
-        {
-            if (!_awake) return;
-
-            PromptNewAction();
-        }
-
-        private void PromptNewAction()
-        {
-            CombatWriter.Singleton.Write("Select An Actor!");
-
-            CombatWriter.Singleton.WriteAvailableCombatants(_board.GetAvailableAllies());
-        }
-
-        public void ReceiveLink(LinkLibrary.LinkData link){
-            // if (_combatManager.Turn != CombatTurn.Ally || !_combatManager.State == CombatState.Control) return;
-            if (!_awake) return;
-
-            if (link.Keyword == "endturn")
-                _combatManager.EndTurn();
-
-            if (_selectedActor == null)
-            {
-                SelectNewActor(link);
                 return;
             }
-            else if (_selectedAbility == null)
-            {
-                SelectNewAbility(link);
+
+            if (SelectedAction == null){
+                if (Input.GetKeyDown(KeyCode.Q)){
+                    SelectedAction = SelectedActor.Stats.Actions[0];
+                }
+                if (Input.GetKeyDown(KeyCode.W)){
+                    SelectedAction = SelectedActor.Stats.Actions[1];
+                }
+
                 return;
             }
-            else if (_selectedTargets.Count() == 0)
-            {
-                SelectNewTargets(link);
-            }
-        }
 
-        private void SelectNewTargets(LinkLibrary.LinkData link)
-        {
-            if (link.LinkClass == LinkLibrary.LinkClass.Enemy || link.LinkClass == LinkLibrary.LinkClass.Ally || link.LinkClass == LinkLibrary.LinkClass.Object)
-            {
-                var availableTargets = _tTool.FilterTargetables(_selectedActor, _selectedAbility, false);
-                var matchingTarget = availableTargets.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
-
-                if (matchingTarget != null)
-                {
-                    _selectedTargets.Add(matchingTarget);
-                }
-                else
-                {
-                    var failedTarget = _tTool.AllTargetables.Where(t => t.Keyword == link.Keyword).FirstOrDefault();
-                    _tTool.TargetingConditionsCheck(_selectedActor, failedTarget, _selectedAbility, writeReason: true);
-                    promptAction = ResetAbility;
-                    StartCoroutine(WaitToClear());
-                    return;
+            if (SelectedTarget == null){
+                if (Input.GetKeyDown(KeyCode.Q)){
+                    SelectedTarget = Gevaudan;
                 }
 
-                CombatWriter.Singleton.ClearConsole();
-                Execute();
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space)){
+                PerformAction(SelectedActor, SelectedAction, SelectedTarget);
+                SelectedAction = null;
+                SelectedActor = null;
+                SelectedTarget = null;
+                EndOfPlayerTurn?.Invoke(this, EventArgs.Empty);
             }
         }
 
-        private void ResetAbility(){
-            ClearAbility();
-            PromptAbilities();
-        }
 
-        private void ResetActor(){
-            ClearActor();
-            PromptNewAction();
-        }
 
-        IEnumerator WaitToClear()
-        {
-            _awake = false;
-
-            //yield on a new YieldInstruction that waits for 5 seconds.
-            yield return new WaitForSeconds(1);
-
-            _awake = true;
-            promptAction();
-        }
-
-        private void SelectNewAbility(LinkLibrary.LinkData link)
-        {
-            if (link.LinkClass == LinkLibrary.LinkClass.Ability)
-            {
-                var matchingAbilities = _selectedActor.Abilities.Where(a => a.Keyword == link.Keyword);
-                if (matchingAbilities.Count() > 0)
-                {
-                    _selectedAbility = matchingAbilities.FirstOrDefault();
-
-                    if (_selectedAbility.TargetTypes.Count == 1 && _selectedAbility.TargetTypes[0] == TargetingClass.Self)
-                    {
-                        SetTargetSelf();
-                        Execute();
-                        return;
-                    }
-
-                    CombatWriter.Singleton.ClearConsole();
-                    PromptNewTarget();
-                }
-            }
-        }
-
-        private static void PromptNewTarget()
-        {
-            CombatWriter.Singleton.Write("Select Target");
-        }
-
-        private void SelectNewActor(LinkLibrary.LinkData link)
-        {
-            if (link.LinkClass == LinkLibrary.LinkClass.Ally)
-            {
-                _availableActors = _cTool.GetAvailableAllies(_board.Allies);
-
-                var matchingActor = _availableActors.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
-                if (matchingActor != null)
-                {
-                    _selectedActor = matchingActor;
-                    PromptAbilities();
-                }
-                else{
-                    var failedActor = _board.Allies.Where(a => a.GetComponent<Targetable>().Keyword == link.Keyword).FirstOrDefault();
-                    _cTool.IsAvailable(failedActor, writeReason: true);
-                    promptAction = ResetActor;
-                    StartCoroutine(WaitToClear());
-                }
-            }
-        }
-
-        private void PromptAbilities()
-        {
-            CombatWriter.Singleton.WriteAvailableAbilities(_selectedActor.Abilities);
-        }
-
-        private void SetActor(Combatant actor){
-            _selectedActor = actor;
-        }
-
-        private void SetAbility(AbilityData ability){
-            _selectedAbility = ability;
-
-            if (ability.TargetingMode == TargetScope.Random)
-                RandomTarget(ability);
-            else if (ability.TargetingMode == TargetScope.Global)
-                GlobalTargets(ability);
-        }
-
-        private void SetTarget(Targetable target){
-            _selectedTargets.Add(target);
-        }
-
-        private void RandomTarget(AbilityData ability){
-            var targetables = _tTool.FilterTargetables(_selectedActor, ability, false);
-            var randomInt = UnityEngine.Random.Range(0, targetables.Count);
-            _selectedTargets.Add(targetables[randomInt]);
-        }
-
-        private void GlobalTargets(AbilityData ability){
-            var targetables = _tTool.FilterTargetables(_selectedActor, ability, false);
-            foreach(Targetable t in targetables){
-                _selectedTargets.Add(t); 
-            }
-        }
-
-        internal void SetTargetSelf()
-        {
-            _selectedTargets.Add(_selectedActor.Targetable);
-        }
-
-        private void Execute(){
-            var tTool = new TargetingTool();
-
-            bool commenseExecute = true;
-
-            foreach(Targetable t in _selectedTargets){
-                if (!tTool.TargetingConditionsCheck(_selectedActor, t, _selectedAbility, true)){
-                    commenseExecute = false;
-                }
-            }
-
-            if (!commenseExecute) return;
-    
-            var ability = new Ability(_selectedAbility, _selectedActor);
-
-            foreach (Targetable t in _selectedTargets){
-                ability.CurrentTargets.Add(t);
-            }
-
-            _selectedActor.ActionProcessor.ReceiveAbility(ability);
-            Clear();
-
-            if (ability.ChannelTime > 0){
-                CombatWriter.Singleton.Write("channeling attack!");
-                _currentTurn = PlayerTurn.Waiting;
-                _events.CallEndOfAction();
-            }
-        }
-
-        private void Clear()
-        {
-            _selectedActor = null;
-            _selectedAbility = null;
-            _selectedTargets.Clear();
-            _availableTargets.Clear();
+        private void PerformAction(ActorEntity sender, ActionData action, Health target){
+            print($"{sender.name} is performing {action.name} on {target.name}");
+            target.ReceiveAction(action);
         }
     }
 }

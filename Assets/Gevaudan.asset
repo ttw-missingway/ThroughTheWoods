@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00c495b9177604023845842f84935ea1, type: 3}
+  m_Name: Gevaudan
+  m_EditorClassIdentifier: 
+  Name: Gevaudan
+  EnemyType: 0
+  FirstDecision: {fileID: 11400000, guid: 90623e01f72ab45a5a05d4234541f2c5, type: 2}
+  Speed: 1
+  Size: 1
+  Strength: 1
+  Magic: 1
+  Intellect: 1
+  Sight: 1
+  Hearing: 1
+  Smell: 1
+  MagicResistance: 1
+  MentalResistance: 1
+  PhysicalResistance: 1
+  ResistanceToTraps: 1
+  ResistanceToWeather: 1
+  ResistanceToGroundEffects: 1
+  ResistanceToWaterEffects: 1
+  ResistanceToAirEffects: 1
+  ResistanceToLampLight: 1
+  ResistanceToSunLight: 1
+  ResistanceToMoonLight: 1
+  ResistanceToElectricLight: 1
